@@ -1,0 +1,24 @@
+{# destination required; category optional. blog_posts / testimonials for jump links. #}
+{% if destination %}
+<nav class="cw-entity-tagging-strip" aria-label="Related guides and reviews on this page">
+  <div class="cw-entity-tagging-strip__layout">
+    <span class="cw-entity-tagging-strip__label">Related on this page</span>
+    <div class="cw-entity-tagging-strip__chips">
+      <a href="{{ destination.get_absolute_url }}" class="cw-entity-tag-chip cw-entity-tag-chip--solid">{{ destination.name }}</a>
+      {% if category %}
+      <a href="{{ category.get_absolute_url }}" class="cw-entity-tag-chip cw-entity-tag-chip--accent">{{ category.name }}</a>
+      {% endif %}
+      {% if blog_posts %}
+      <a href="#cw-entity-blog" class="cw-entity-tag-chip cw-entity-tag-chip--ghost">
+        <i class="bi bi-journal-text" aria-hidden="true"></i><span>{{ blog_posts|length }} article{{ blog_posts|length|pluralize }}</span>
+      </a>
+      {% endif %}
+      {% if testimonials %}
+      <a href="#cw-entity-reviews" class="cw-entity-tag-chip cw-entity-tag-chip--ghost">
+        <i class="bi bi-chat-quote" aria-hidden="true"></i><span>Reviews</span>
+      </a>
+      {% endif %}
+    </div>
+  </div>
+</nav>
+{% endif %}

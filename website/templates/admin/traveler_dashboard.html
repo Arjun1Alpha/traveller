@@ -1,0 +1,12 @@
+{% extends "admin/index.html" %}
+{% load static admin_dashboard %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'website/css/admin_dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+    {% dashboard_stats %}
+    {{ block.super }}
+{% endblock %}

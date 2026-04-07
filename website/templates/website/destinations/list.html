@@ -1,0 +1,115 @@
+{% extends "website/base.html" %}
+{% block title %}Destinations — {{ site_settings.site_name }}{% endblock %}
+{% block content %}
+<div class="cw-dest-list-hero rounded-4 overflow-hidden mb-4 mb-lg-5">
+  <div class="cw-dest-list-hero__inner p-4 p-lg-5">
+    <div class="row align-items-center g-4">
+      <div class="col-lg-7">
+        <p class="text-uppercase small fw-semibold text-cw-accent mb-2 cw-dest-list-kicker">Where we go</p>
+        <h1 class="display-6 fw-bold text-cw-navy mb-3">Destinations</h1>
+        <p class="text-secondary mb-0 lead fs-6">
+          Browse city hubs with curated categories, guided tours, standout sights, and local things to do — all in one place.
+        </p>
+      </div>
+      <div class="col-lg-5">
+        <form class="cw-dest-list-search" method="get" action="{% url 'destination_list' %}" role="search">
+          <label class="visually-hidden" for="dest-filter-q">Filter destinations</label>
+          <div class="input-group input-group-lg shadow-sm rounded-3 overflow-hidden bg-white">
+            <span class="input-group-text border-0 bg-white text-muted ps-3"><i class="bi bi-search" aria-hidden="true"></i></span>
+            <input
+              id="dest-filter-q"
+              type="search"
+              name="q"
+              value="{{ search_q|default:'' }}"
+              class="form-control border-0 shadow-none"
+              placeholder="Search by city or keyword…"
+              autocomplete="off"
+            >
+            <button class="btn btn-cw-accent px-4" type="submit">Search</button>
+          </div>
+          <div class="d-flex flex-wrap gap-2 mt-3 justify-content-lg-end">
+            <a href="{% url 'search' %}{% if search_q %}?q={{ search_q|urlencode }}{% endif %}" class="btn btn-sm btn-link text-decoration-none text-cw-navy px-0">
+              Search entire site <i class="bi bi-arrow-right-short" aria-hidden="true"></i>
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if destinations %}
+<div class="row g-4">
+  {% for d in destinations %}
+  <div class="col-md-6 col-xl-4">
+    <article class="cw-dest-grid-card h-100 cw-card-hover bg-white rounded-4 overflow-hidden border border-light shadow-sm">
+      <a href="{{ d.get_absolute_url }}" class="text-decoration-none text-reset d-flex flex-column h-100">
+        <div class="position-relative cw-dest-grid-card__media-wrap">
+          {% if d.listing_image_url %}
+          <div
+            class="cw-dest-grid-card__media"
+            style="background-image: url('{{ d.listing_image_url }}');"
+            role="img"
+            aria-label="{{ d.name }}"
+          ></div>
+          {% else %}
+          <div class="cw-dest-grid-card__media cw-dest-grid-card__media--placeholder d-flex align-items-center justify-content-center" aria-hidden="true">
+            <i class="bi bi-geo-alt-fill cw-dest-grid-card__placeholder-icon"></i>
+          </div>
+          {% endif %}
+          <div class="position-absolute top-0 end-0 m-3">
+            <span class="badge rounded-pill cw-dest-grid-card__badge shadow-sm">
+              <i class="bi bi-compass me-1" aria-hidden="true"></i> Hub
+            </span>
+          </div>
+        </div>
+        <div class="p-4 flex-grow-1 d-flex flex-column">
+          <h2 class="h5 fw-bold text-cw-navy mb-2">{{ d.name }}</h2>
+          {% if d.summary %}
+          <p class="text-secondary small mb-3 cw-line-clamp-2 flex-grow-1">{{ d.summary }}</p>
+          {% else %}
+          <p class="text-secondary small mb-3 flex-grow-1">Guides, tours, and ideas for this city.</p>
+          {% endif %}
+          <div class="d-flex flex-wrap gap-2 mb-3">
+            {% if d.tour_count %}
+            <span class="badge rounded-pill cw-dest-stat-pill">{{ d.tour_count }} tour{{ d.tour_count|pluralize }}</span>
+            {% endif %}
+            {% if d.category_count %}
+            <span class="badge rounded-pill cw-dest-stat-pill">{{ d.category_count }} categor{{ d.category_count|pluralize:"y,ies" }}</span>
+            {% endif %}
+            {% if d.attraction_count %}
+            <span class="badge rounded-pill cw-dest-stat-pill text-truncate" style="max-width: 100%;">{{ d.attraction_count }} sight{{ d.attraction_count|pluralize }}</span>
+            {% endif %}
+            {% if d.thing_count %}
+            <span class="badge rounded-pill cw-dest-stat-pill">{{ d.thing_count }} to-do{{ d.thing_count|pluralize }}</span>
+            {% endif %}
+          </div>
+          <div class="d-flex align-items-center justify-content-between pt-2 border-top border-light mt-auto">
+            <span class="small fw-semibold text-cw-accent">Open city hub</span>
+            <span class="text-cw-accent" aria-hidden="true"><i class="bi bi-arrow-up-right-circle fs-5"></i></span>
+          </div>
+        </div>
+      </a>
+    </article>
+  </div>
+  {% endfor %}
+</div>
+{% elif search_q %}
+<div class="text-center py-5 px-3 rounded-4 bg-light border border-light">
+  <div class="cw-dest-empty-icon rounded-circle d-inline-flex align-items-center justify-content-center mb-3">
+    <i class="bi bi-search text-cw-accent fs-3" aria-hidden="true"></i>
+  </div>
+  <h2 class="h5 text-cw-navy fw-bold">No matches for “{{ search_q }}”</h2>
+  <p class="text-secondary mb-4">Try another keyword or browse the full list.</p>
+  <a href="{% url 'destination_list' %}" class="btn btn-cw-accent">Clear filter</a>
+</div>
+{% else %}
+<div class="text-center py-5 px-3 rounded-4 bg-light border border-light">
+  <div class="cw-dest-empty-icon rounded-circle d-inline-flex align-items-center justify-content-center mb-3">
+    <i class="bi bi-globe2 text-cw-accent fs-3" aria-hidden="true"></i>
+  </div>
+  <h2 class="h5 text-cw-navy fw-bold">No destinations yet</h2>
+  <p class="text-secondary mb-0">Add cities in the admin to build out this page.</p>
+</div>
+{% endif %}
+{% endblock %}

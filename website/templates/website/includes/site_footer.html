@@ -1,0 +1,97 @@
+{% load site_tags %}
+<footer class="cw-footer bg-cw-navy-deep text-white pt-5 pb-0 mt-auto">
+  <div class="container">
+    <div class="row g-4 pb-4 border-bottom border-secondary border-opacity-25">
+      <div class="col-lg-5">
+        <h2 class="h5 fw-bold mb-3">{{ site_settings.newsletter_title }}</h2>
+        {% if site_settings.newsletter_subtitle %}
+        <p class="small text-white-50 mb-3">{{ site_settings.newsletter_subtitle }}</p>
+        {% endif %}
+        <form method="post" action="{% url 'lead_submit' %}" class="row g-2 align-items-stretch">
+          {% csrf_token %}
+          <input type="hidden" name="name" value="Newsletter subscriber">
+          <input type="hidden" name="source_page" value="home">
+          <input type="hidden" name="next" value="{{ request.path }}">
+          <div class="col-sm-8">
+            <label class="visually-hidden" for="footer-email">Email</label>
+            <input
+              id="footer-email"
+              type="email"
+              name="email"
+              class="form-control"
+              placeholder="Your email"
+              required
+              autocomplete="email"
+            >
+          </div>
+          <div class="col-sm-4">
+            <button type="submit" class="btn btn-cw-accent w-100">Subscribe</button>
+          </div>
+        </form>
+        {% if site_settings.newsletter_fine_print %}
+        <p class="small text-white-50 mt-2 mb-0">
+          <i class="bi bi-shield-check me-1" aria-hidden="true"></i>{{ site_settings.newsletter_fine_print }}
+        </p>
+        {% endif %}
+      </div>
+      <div class="col-6 col-md-3 col-lg-2">
+        <h3 class="h6 text-uppercase fw-bold text-white-50 mb-3">Company</h3>
+        <ul class="list-unstyled small mb-0">
+          {% for link in footer_company_links %}
+          <li class="mb-2"><a href="{% cw_href link.href %}">{{ link.label }}</a></li>
+          {% empty %}
+          <li class="mb-2"><a href="{% url 'about' %}">About us</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div class="col-6 col-md-3 col-lg-2">
+        <h3 class="h6 text-uppercase fw-bold text-white-50 mb-3">Help</h3>
+        <ul class="list-unstyled small mb-0">
+          {% for link in footer_help_links %}
+          <li class="mb-2"><a href="{% cw_href link.href %}">{{ link.label }}</a></li>
+          {% empty %}
+          <li class="mb-2"><a href="{% url 'faqs' %}">FAQs</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <h3 class="h6 text-uppercase fw-bold text-white-50 mb-3">Trusted travel</h3>
+        <div class="d-flex flex-wrap gap-2 mb-3">
+          {% for b in footer_trust_badges %}
+          <span class="badge bg-white bg-opacity-10 border border-secondary border-opacity-25">{{ b.label }}</span>
+          {% empty %}
+          <span class="badge bg-white bg-opacity-10 border border-secondary border-opacity-25">ATO</span>
+          {% endfor %}
+        </div>
+        <div class="d-flex gap-3 fs-4">
+          {% for s in social_links %}
+          <a href="{{ s.url }}" class="text-white-50" rel="noopener noreferrer" target="_blank" aria-label="{{ s.get_network_display }}"><i class="bi {{ s.icon_bootstrap }}"></i></a>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    <div class="row align-items-center py-3 small text-white-50">
+      <div class="col-md-6 mb-2 mb-md-0">
+        {% if site_settings.footer_payment_line %}
+        {{ site_settings.footer_payment_line }}
+        {% else %}
+        <span class="me-3"><i class="bi bi-credit-card me-1"></i>Visa</span>
+        <span class="me-3">MC</span>
+        <span><i class="bi bi-paypal me-1"></i>PayPal</span>
+        {% endif %}
+      </div>
+      <div class="col-md-6 text-md-end">
+        © {% now "Y" %} {{ site_settings.copyright_holder|default:site_settings.site_name }}. All rights reserved.
+        <a href="{% url 'legal' %}" class="ms-2">Privacy &amp; terms</a>
+      </div>
+    </div>
+  </div>
+  {% if press_mentions %}
+  <div class="bg-black bg-opacity-25 py-2 text-center small text-white-50">
+    {{ site_settings.press_bar_intro }}
+    {% for p in press_mentions %}
+    {% if not forloop.first %} · {% endif %}<span class="text-white-50">{{ p.name }}</span>
+    {% endfor %}
+  </div>
+  {% endif %}
+</footer>

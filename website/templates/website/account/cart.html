@@ -1,0 +1,52 @@
+{% extends "website/base.html" %}
+{% block title %}Your cart — {{ site_settings.site_name }}{% endblock %}
+{% block content %}
+<nav class="mb-3" aria-label="Breadcrumb">
+  <ol class="breadcrumb small mb-0">
+    <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-decoration-none">Home</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Cart</li>
+  </ol>
+</nav>
+<h1 class="h3 fw-bold text-cw-navy mb-1">Tour shortlist</h1>
+<p class="text-secondary small mb-4">Demo cart — use <a href="{% url 'contact' %}">Contact</a> to confirm real bookings.</p>
+{% if user.is_authenticated %}{% include "website/account/_nav.html" with account_nav="cart" %}{% endif %}
+{% if cart_items %}
+<form method="post" action="{% url 'account_cart_update' %}">
+  {% csrf_token %}
+  <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+    <ul class="list-group list-group-flush">
+      {% for line in cart_items %}
+      <li class="list-group-item py-3">
+        <div class="row align-items-center g-3">
+          <div class="col-md-6">
+            <a href="{{ line.tour.get_absolute_url }}" class="fw-semibold text-cw-navy text-decoration-none">{{ line.tour.name }}</a>
+            <div class="small text-muted">{{ line.tour.destination.name }}</div>
+            {% if line.tour.price_from %}
+            <div class="small text-cw-accent fw-semibold mt-1">{{ line.tour.currency }}&nbsp;{{ line.tour.price_from|floatformat:0 }}+ <span class="text-muted fw-normal">per person</span></div>
+            {% endif %}
+          </div>
+          <div class="col-md-3">
+            <label class="form-label small mb-0" for="qty_{{ line.id }}">Guests</label>
+            <input type="number" class="form-control form-control-sm" name="qty_{{ line.id }}" id="qty_{{ line.id }}" min="1" max="20" value="{{ line.quantity }}">
+          </div>
+          <div class="col-md-3 text-md-end">
+            <button type="submit" formaction="{% url 'account_cart_remove' line.id %}" formmethod="post" class="btn btn-sm btn-outline-danger rounded-pill">Remove</button>
+          </div>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+    <div class="card-body border-top bg-light d-flex flex-wrap gap-2 justify-content-between align-items-center">
+      <button type="submit" class="btn btn-cw-accent rounded-pill">Update quantities</button>
+      <a href="{% url 'contact' %}" class="btn btn-outline-primary rounded-pill">Request booking help</a>
+    </div>
+  </div>
+</form>
+{% else %}
+<div class="cw-home-empty-soft rounded-4 p-5 text-center">
+  <i class="bi bi-bag text-cw-accent fs-2 d-block mb-3" aria-hidden="true"></i>
+  <p class="text-secondary mb-4">Your shortlist is empty. Add tours from any tour page.</p>
+  <a href="{% url 'destination_list' %}" class="btn btn-cw-accent rounded-pill">Browse destinations</a>
+</div>
+{% endif %}
+{% endblock %}

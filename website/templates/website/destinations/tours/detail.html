@@ -1,0 +1,171 @@
+{% extends "website/base.html" %}
+{% block title %}{{ tour.name }} — {{ destination.name }} — {{ site_settings.site_name }}{% endblock %}
+{% block layout %}
+<section
+  class="cw-tour-pdp-hero position-relative text-white d-flex flex-column"
+  style="min-height: min(48vh, 500px);"
+>
+  {% if tour.listing_image_url %}
+  <div
+    class="cw-tour-pdp-hero__bg"
+    style="background-image: url('{{ tour.listing_image_url }}');"
+    role="img"
+    aria-label=""
+  ></div>
+  {% elif tour_gallery_images %}
+  <div
+    class="cw-tour-pdp-hero__bg"
+    style="background-image: url('{{ tour_gallery_images.0.image_url }}');"
+    role="img"
+    aria-label=""
+  ></div>
+  {% else %}
+  <div class="cw-tour-pdp-hero__bg cw-tour-pdp-hero__bg--fallback" aria-hidden="true"></div>
+  {% endif %}
+  <div class="position-absolute top-0 start-0 w-100 h-100 cw-hub-hero__overlay"></div>
+  <div class="container position-relative d-flex flex-column flex-grow-1 justify-content-end pt-5 pb-4 pb-lg-5 cw-tour-pdp-hero__content">
+    <nav class="small mb-3" aria-label="Breadcrumb">
+      <ol class="breadcrumb cw-hub-breadcrumb mb-0">
+        <li class="breadcrumb-item"><a href="{% url 'destination_list' %}" class="text-white-50 text-decoration-none">Destinations</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'destination_hub' destination.slug %}" class="text-white-50 text-decoration-none">{{ destination.name }}</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'tour_list' destination.slug %}" class="text-white-50 text-decoration-none">Tours</a></li>
+        <li class="breadcrumb-item active text-white" aria-current="page">{{ tour.name }}</li>
+      </ol>
+    </nav>
+    <p class="text-uppercase small fw-semibold text-white-50 mb-2 cw-hub-hero__kicker">{{ destination.name }}</p>
+    <h1 class="cw-hub-hero__title mb-3">{{ tour.name }}</h1>
+    {% if tour.teaser %}
+    <p class="cw-tour-pdp-hero__teaser text-white-50 mb-4 col-lg-10 px-0">{{ tour.teaser }}</p>
+    {% endif %}
+    <div class="d-flex flex-wrap gap-2 mb-1">
+      {% if tour.category %}
+      <a href="{{ tour.category.get_absolute_url }}" class="cw-hub-stat-pill text-white text-decoration-none">{{ tour.category.name }}</a>
+      {% endif %}
+      <span class="cw-hub-stat-pill">Guided experience</span>
+    </div>
+  </div>
+</section>
+
+<div class="container py-4 py-lg-5 cw-page cw-tour-pdp-page">
+{% block content %}
+<div class="row cw-tour-pdp-overlap-row g-4">
+  <div class="col-lg-5 ms-lg-auto">
+    <aside class="cw-tour-pdp-book-float">
+      <div class="cw-tour-pdp-book-float__accent" aria-hidden="true"></div>
+      <div class="cw-tour-booking-card card border-0 shadow-none p-4 text-center text-lg-start">
+        {% if tour.price_from %}
+        <p class="h3 fw-bold text-cw-navy mb-0">{{ tour.currency }}&nbsp;{{ tour.price_from|floatformat:0 }}<span class="fs-6 fw-semibold text-secondary">+</span></p>
+        <p class="small text-muted mb-3">From per person · taxes may apply</p>
+        {% else %}
+        <p class="h5 fw-bold text-cw-navy mb-1">Custom quote</p>
+        <p class="small text-muted mb-3">We’ll confirm price for your dates and group size.</p>
+        {% endif %}
+        <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start gap-2 mb-2">
+          <span class="badge rounded-pill bg-cw-sky text-cw-navy">
+            <i class="bi bi-star-fill text-warning me-1" aria-hidden="true"></i>{{ tour.rating_average|floatformat:1 }} ({{ tour.review_count }})
+          </span>
+          <span class="badge rounded-pill cw-tour-pdp-meta-pill cw-tour-pdp-meta-pill--muted">
+            <i class="bi bi-clock me-1" aria-hidden="true"></i>{{ tour.duration_hours|floatformat:1 }} h
+          </span>
+          {% if tour.group_size_max %}
+          <span class="badge rounded-pill cw-tour-pdp-meta-pill cw-tour-pdp-meta-pill--muted">
+            <i class="bi bi-people me-1" aria-hidden="true"></i>Max {{ tour.group_size_max }}
+          </span>
+          {% endif %}
+        </div>
+        {% if tour.languages %}
+        <p class="small text-secondary mb-2"><i class="bi bi-translate me-1" aria-hidden="true"></i>{{ tour.languages }}</p>
+        {% endif %}
+        <div class="d-flex flex-wrap gap-1 mb-3 justify-content-center justify-content-lg-start">
+          {% if tour.skip_the_line %}<span class="badge rounded-pill cw-tour-badge cw-tour-badge--skip">Skip the line</span>{% endif %}
+          {% if tour.free_cancellation %}<span class="badge rounded-pill cw-tour-badge cw-tour-badge--calm">Free cancellation</span>{% endif %}
+          {% if tour.wheelchair_accessible %}<span class="badge rounded-pill cw-tour-badge cw-tour-badge--calm">Accessible</span>{% endif %}
+        </div>
+        <a href="{% url 'contact' %}" class="btn btn-cw-accent rounded-pill w-100 mb-2">Check availability</a>
+        {% if user.is_authenticated %}
+        <form method="post" action="{% url 'account_cart_add' tour.pk %}" class="mb-2">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.get_full_path }}">
+          <div class="d-flex flex-wrap gap-2 align-items-center justify-content-center justify-content-lg-start">
+            <label class="small text-secondary mb-0" for="cart-qty-{{ tour.pk }}">Guests</label>
+            <select name="quantity" id="cart-qty-{{ tour.pk }}" class="form-select form-select-sm" style="max-width: 5rem;">
+              <option value="1" selected>1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+              <option value="8">8</option>
+              <option value="10">10</option>
+            </select>
+            <button type="submit" class="btn btn-outline-primary btn-sm rounded-pill flex-grow-1 flex-lg-grow-0">
+              <i class="bi bi-bag-plus me-1" aria-hidden="true"></i>Add to shortlist
+            </button>
+          </div>
+        </form>
+        {% else %}
+        <div class="rounded-3 border border-light bg-cw-sky bg-opacity-50 p-3 mb-2 text-center text-lg-start">
+          <p class="small text-secondary mb-2 mb-lg-1">Sign in to save this tour to your shortlist.</p>
+          <div class="d-flex flex-wrap gap-2 justify-content-center justify-content-lg-start">
+            <a href="{% url 'account_login' %}?next={{ request.get_full_path|urlencode }}" class="btn btn-outline-primary btn-sm rounded-pill">Log in</a>
+            <a href="{% url 'account_signup' %}?next={{ request.get_full_path|urlencode }}" class="btn btn-cw-accent btn-sm rounded-pill">Sign up</a>
+          </div>
+        </div>
+        {% endif %}
+        <p class="small text-muted mb-0 text-center text-lg-start">No payment taken on this demo site.</p>
+      </div>
+      <div class="text-lg-end p-3">
+        <a href="{% url 'tour_list' destination.slug %}" class="btn btn-outline-primary rounded-pill px-4">More {{ destination.name }} tours</a>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<div class="mt-4 pt-lg-2">
+  {% include "website/includes/entity_tagging_strip.html" with destination=destination category=tour.category blog_posts=related_blog_posts testimonials=page_testimonials %}
+</div>
+
+<section class="card border-0 shadow-sm rounded-4 mb-5" id="ask-tour" aria-labelledby="ask-tour-heading">
+  <div class="card-body p-4">
+    <h2 class="h5 fw-bold text-cw-navy mb-2" id="ask-tour-heading">Ask about this tour</h2>
+    {% if user.is_authenticated %}
+    <p class="small text-secondary mb-3">We’ll reply by email. You’re signed in as <strong>{{ user.email }}</strong>.</p>
+    <form method="post" action="{% url 'tour_inquiry_submit' destination.slug tour.slug %}">
+      {% csrf_token %}
+      <label class="form-label small" for="inq-message">Message</label>
+      <textarea class="form-control mb-3" id="inq-message" name="message" rows="4" required placeholder="Dates, group size, accessibility, or other questions…"></textarea>
+      <button type="submit" class="btn btn-outline-primary rounded-pill">Send question</button>
+    </form>
+    {% else %}
+    <p class="small text-secondary mb-3">Tour-specific questions are available to signed-in members. You can still reach us on the <a href="{% url 'contact' %}">contact page</a>.</p>
+    <div class="d-flex flex-wrap gap-2">
+      <a href="{% url 'account_login' %}?next={{ request.get_full_path|urlencode }}" class="btn btn-outline-primary rounded-pill">Log in to ask</a>
+      <a href="{% url 'account_signup' %}?next={{ request.get_full_path|urlencode }}" class="btn btn-cw-accent rounded-pill">Create account</a>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+{% include "website/includes/entity_gallery_section.html" with gallery_images=tour_gallery_images section_title="Photos" %}
+
+<article class="cw-tour-pdp-article mb-5">
+  {% if tour.body %}
+  <div class="cw-tour-pdp-body text-secondary">
+    {{ tour.body|linebreaks }}
+  </div>
+  {% else %}
+  <p class="text-muted fst-italic mb-0">Full description coming soon — contact us for details on this experience.</p>
+  {% endif %}
+</article>
+
+{% include "website/includes/entity_blog_section.html" with blog_posts=related_blog_posts section_kicker="From the blog" section_title="Stories featuring this tour" %}
+
+{% include "website/includes/entity_testimonials_section.html" with testimonials=page_testimonials rail_subtitle="Tagged for this tour or shared from our travelers worldwide." %}
+
+<div class="pt-4 border-top border-light d-flex flex-wrap gap-3 justify-content-between align-items-center">
+  <a href="{% url 'tour_list' destination.slug %}" class="text-decoration-none text-secondary small"><i class="bi bi-arrow-left me-1" aria-hidden="true"></i>All tours in {{ destination.name }}</a>
+  <a href="{% url 'destination_hub' destination.slug %}" class="text-decoration-none text-cw-accent small fw-semibold">City hub</a>
+</div>
+{% endblock %}
+</div>
+{% endblock %}

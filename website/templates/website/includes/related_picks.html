@@ -1,0 +1,134 @@
+{% if site_page %}
+{% with fd=site_page.featured_destinations.all fb=site_page.featured_blog_posts.all ft=site_page.featured_tours.all fa=site_page.featured_attractions.all fth=site_page.featured_things_to_do.all %}
+{% if fb or ft or fa or fth or fd and not skip_featured_destinations %}
+<section class="cw-picks-section py-5">
+  <div class="container">
+    <header class="text-center mb-5 mx-auto" style="max-width: 36rem;">
+      <p class="cw-home-section-head__kicker mb-0">Curated for you</p>
+      <h2 class="cw-home-section-head__title h4 mt-2 mb-2">Featured on this page</h2>
+      <p class="text-secondary small mb-0">Hand-picked destinations, stories, tours, and ideas from the CMS.</p>
+    </header>
+
+    {% if fd and not skip_featured_destinations %}
+    <h3 class="cw-picks-block-title">Destinations</h3>
+    <div class="row g-4 mb-5">
+      {% for d in fd %}
+      <div class="col-md-6 col-lg-4">
+        <article class="cw-pick-dest-card h-100 overflow-hidden d-flex flex-column">
+          <a href="{{ d.get_absolute_url }}" class="text-decoration-none flex-shrink-0">
+            {% if d.listing_image_url %}
+            <div class="cw-pick-dest-card__media" style="background-image: url('{{ d.listing_image_url }}');" role="img" aria-label="{{ d.name }}"></div>
+            {% else %}
+            <div class="cw-pick-dest-card__media cw-pick-dest-card__media--ph" aria-hidden="true"><i class="bi bi-geo-alt-fill"></i></div>
+            {% endif %}
+          </a>
+          <div class="p-4 d-flex flex-column flex-grow-1">
+            <h4 class="h6 fw-bold mb-2"><a href="{{ d.get_absolute_url }}" class="text-cw-navy text-decoration-none">{{ d.name }}</a></h4>
+            {% if d.summary %}<p class="small text-secondary cw-line-clamp-2 mb-3">{{ d.summary }}</p>{% endif %}
+            <div class="d-flex flex-wrap gap-2 mt-auto">
+              <a href="{% url 'destination_categories' d.slug %}" class="badge rounded-pill text-decoration-none cw-dest-stat-pill">Categories</a>
+              <a href="{% url 'tour_list' d.slug %}" class="badge rounded-pill text-decoration-none cw-dest-stat-pill">Tours</a>
+              <a href="{% url 'destination_attractions' d.slug %}" class="badge rounded-pill text-decoration-none cw-dest-stat-pill">Sights</a>
+              <a href="{% url 'destination_things_to_do' d.slug %}" class="badge rounded-pill text-decoration-none cw-dest-stat-pill">To-do</a>
+            </div>
+          </div>
+        </article>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if fb %}
+    <h3 class="cw-picks-block-title">Blog</h3>
+    <div class="row g-4 mb-5">
+      {% for p in fb %}
+      <div class="col-md-6 col-lg-4">
+        <article class="cw-pick-blog-card h-100 overflow-hidden d-flex flex-column">
+          <a href="{{ p.get_absolute_url }}" class="text-decoration-none text-reset d-flex flex-column h-100">
+            <div class="cw-home-blog-card__media flex-shrink-0">
+              {% if p.listing_image_url %}
+              <img src="{{ p.listing_image_url }}" alt="" loading="lazy" width="400" height="300">
+              {% elif site_settings.default_card_image_url %}
+              <img src="{{ site_settings.default_card_image_url }}" alt="" loading="lazy" width="400" height="300">
+              {% else %}
+              <img src="{% cycle 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=600&q=80' 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&q=80' 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=600&q=80' %}" alt="" loading="lazy" width="400" height="300">
+              {% endif %}
+            </div>
+            <div class="p-4 d-flex flex-column flex-grow-1">
+              <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                <span class="badge rounded-pill cw-home-blog-scope">{{ p.get_scope_display }}</span>
+                {% if p.published_at %}<time class="small text-muted" datetime="{{ p.published_at|date:'c' }}">{{ p.published_at|date:"M j, Y" }}</time>{% endif %}
+              </div>
+              <h4 class="h6 fw-bold text-cw-navy mb-0">{{ p.title }}</h4>
+              {% if p.excerpt %}<p class="small text-secondary cw-line-clamp-2 mt-2 mb-0">{{ p.excerpt }}</p>{% endif %}
+            </div>
+          </a>
+        </article>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if ft %}
+    <h3 class="cw-picks-block-title">Tours</h3>
+    <div class="row g-4 mb-5">
+      {% for t in ft %}
+      <div class="col-md-6">
+        <article class="cw-pick-tour-card h-100 p-4">
+          <a href="{{ t.get_absolute_url }}" class="text-decoration-none text-reset d-block h-100">
+            <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+              <span class="badge rounded-pill bg-cw-sky text-cw-navy fw-semibold">{{ t.destination.name }}</span>
+            </div>
+            <h4 class="h6 fw-bold text-cw-navy mb-2">{{ t.name }}</h4>
+            {% if t.teaser %}<p class="small text-secondary cw-line-clamp-2 mb-3">{{ t.teaser }}</p>{% endif %}
+            <span class="small fw-semibold text-cw-accent">View tour <i class="bi bi-arrow-up-right" aria-hidden="true"></i></span>
+          </a>
+        </article>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if fa %}
+    <h3 class="cw-picks-block-title">Attractions</h3>
+    <div class="row g-3 mb-5">
+      {% for a in fa %}
+      <div class="col-md-6 col-lg-4">
+        <article class="cw-pick-mini-card h-100 p-4">
+          <a href="{% url 'destination_attractions' a.destination.slug %}" class="text-decoration-none text-reset d-flex gap-3 align-items-start">
+            <div class="cw-pick-mini-card__icon" aria-hidden="true"><i class="bi bi-camera"></i></div>
+            <div class="min-w-0">
+              <h4 class="h6 fw-bold text-cw-navy mb-1">{{ a.name }}</h4>
+              <p class="small text-muted mb-1">{{ a.destination.name }}</p>
+              {% if a.summary %}<p class="small text-secondary cw-line-clamp-2 mb-0">{{ a.summary }}</p>{% endif %}
+            </div>
+          </a>
+        </article>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if fth %}
+    <h3 class="cw-picks-block-title">Things to do</h3>
+    <div class="row g-3">
+      {% for item in fth %}
+      <div class="col-md-6 col-lg-4">
+        <article class="cw-pick-mini-card h-100 p-4">
+          <a href="{% url 'destination_things_to_do' item.destination.slug %}" class="text-decoration-none text-reset d-flex gap-3 align-items-start">
+            <div class="cw-pick-mini-card__icon" aria-hidden="true"><i class="bi bi-stars"></i></div>
+            <div class="min-w-0">
+              <h4 class="h6 fw-bold text-cw-navy mb-1">{{ item.name }}</h4>
+              <p class="small text-muted mb-0">{{ item.destination.name }}</p>
+            </div>
+          </a>
+        </article>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endif %}
+{% endwith %}
+{% endif %}

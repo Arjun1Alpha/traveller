@@ -1,0 +1,50 @@
+{% extends "website/base.html" %}
+{% block title %}Your profile — {{ site_settings.site_name }}{% endblock %}
+{% block content %}
+<nav class="mb-3" aria-label="Breadcrumb">
+  <ol class="breadcrumb small mb-0">
+    <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-decoration-none">Home</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'account_home' %}" class="text-decoration-none">Account</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Profile</li>
+  </ol>
+</nav>
+<h1 class="h3 fw-bold text-cw-navy mb-1">Your account</h1>
+<p class="text-secondary small mb-4">Signed in as <strong>{{ user.email }}</strong></p>
+{% include "website/account/_nav.html" with account_nav="profile" %}
+<div class="card border-0 shadow-sm rounded-4">
+  <div class="card-body p-4">
+    <h2 class="h5 fw-bold text-cw-navy mb-3">Profile details</h2>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label small fw-semibold" for="{{ user_form.first_name.id_for_label }}">First name</label>
+          {{ user_form.first_name }}
+          {% if user_form.first_name.errors %}<div class="invalid-feedback d-block">{{ user_form.first_name.errors }}</div>{% endif %}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label small fw-semibold" for="{{ user_form.last_name.id_for_label }}">Last name</label>
+          {{ user_form.last_name }}
+          {% if user_form.last_name.errors %}<div class="invalid-feedback d-block">{{ user_form.last_name.errors }}</div>{% endif %}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label small fw-semibold" for="{{ user_form.email.id_for_label }}">Email</label>
+          {{ user_form.email }}
+          {% if user_form.email.errors %}<div class="invalid-feedback d-block">{{ user_form.email.errors }}</div>{% endif %}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label small fw-semibold" for="{{ user_form.phone.id_for_label }}">Phone <span class="text-muted fw-normal">(optional)</span></label>
+          {{ user_form.phone }}
+          {% if user_form.phone.errors %}<div class="invalid-feedback d-block">{{ user_form.phone.errors }}</div>{% endif %}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label small fw-semibold" for="{{ user_form.country.id_for_label }}">Country <span class="text-muted fw-normal">(optional)</span></label>
+          {{ user_form.country }}
+          {% if user_form.country.errors %}<div class="invalid-feedback d-block">{{ user_form.country.errors }}</div>{% endif %}
+        </div>
+      </div>
+      <button type="submit" class="btn btn-cw-accent rounded-pill mt-4">Save changes</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

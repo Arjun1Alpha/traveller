@@ -1,0 +1,52 @@
+{% extends "website/base.html" %}
+{% block title %}{{ thing.name }} — {{ destination.name }} — {{ site_settings.site_name }}{% endblock %}
+{% block content %}
+<nav class="mb-3" aria-label="Breadcrumb">
+  <ol class="breadcrumb small mb-0">
+    <li class="breadcrumb-item"><a href="{% url 'destination_list' %}" class="text-decoration-none">Destinations</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'destination_hub' destination.slug %}" class="text-decoration-none">{{ destination.name }}</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'destination_things_to_do' destination.slug %}" class="text-decoration-none">Things to do</a></li>
+    <li class="breadcrumb-item active" aria-current="page">{{ thing.name }}</li>
+  </ol>
+</nav>
+
+<header class="cw-things-detail-header rounded-4 p-4 p-lg-5 mb-4 mb-lg-5">
+  <div class="row g-4 align-items-start">
+    <div class="col-lg-8">
+      <p class="cw-home-section-head__kicker mb-2">{{ destination.name }}</p>
+      <h1 class="cw-home-section-head__title display-6 mb-3">{{ thing.name }}</h1>
+      <span class="badge rounded-pill cw-tour-pdp-meta-pill cw-tour-pdp-meta-pill--muted">Things to do</span>
+    </div>
+    <div class="col-lg-4 text-lg-end">
+      <a href="{% url 'destination_things_to_do' destination.slug %}" class="btn btn-outline-primary rounded-pill px-4">All activities</a>
+    </div>
+  </div>
+  {% if thing.summary %}
+  <p class="cw-tour-pdp-lead text-secondary fs-5 mb-0 mt-4 pt-4 border-top border-light">{{ thing.summary }}</p>
+  {% endif %}
+  <div class="mt-4 pt-3 border-top border-light">
+    {% include "website/includes/entity_tagging_strip.html" with destination=destination blog_posts=related_blog_posts testimonials=page_testimonials %}
+  </div>
+</header>
+
+{% include "website/includes/entity_gallery_section.html" with gallery_images=gallery_images section_title="Gallery" %}
+
+{% if thing.body %}
+<article class="cw-tour-pdp-article mb-5">
+  <div class="cw-tour-pdp-body text-secondary">{{ thing.body|linebreaks }}</div>
+</article>
+{% elif not thing.summary %}
+<article class="cw-tour-pdp-article mb-5">
+  <p class="text-muted fst-italic mb-0">More detail coming soon.</p>
+</article>
+{% endif %}
+
+{% include "website/includes/entity_blog_section.html" with blog_posts=related_blog_posts section_kicker="From the blog" section_title="Related guides" %}
+
+{% include "website/includes/entity_testimonials_section.html" with testimonials=page_testimonials rail_subtitle="Reviews tagged for this activity, plus highlights from our guests." %}
+
+<div class="pt-4 border-top border-light d-flex flex-wrap gap-3 justify-content-between align-items-center">
+  <a href="{% url 'destination_things_to_do' destination.slug %}" class="text-decoration-none text-secondary small"><i class="bi bi-arrow-left me-1" aria-hidden="true"></i>All things to do</a>
+  <a href="{% url 'destination_hub' destination.slug %}" class="text-decoration-none text-cw-accent small fw-semibold">City hub</a>
+</div>
+{% endblock %}

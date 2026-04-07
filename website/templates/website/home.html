@@ -1,0 +1,428 @@
+{% extends "website/base.html" %}
+{% load site_tags %}
+{% block title %}{{ site_page.title }} — {{ site_settings.site_name }}{% endblock %}
+{% block extra_head %}
+{% if destination_showcase or home_blog_posts or gallery_images or testimonials %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+{% endif %}
+{% endblock %}
+{% block layout %}
+<section
+  class="position-relative text-white d-flex align-items-end"
+  style="min-height: 72vh; background: center/cover no-repeat url('{{ hero_image_url }}');"
+>
+  <div class="position-absolute top-0 start-0 w-100 h-100 cw-hero-overlay"></div>
+  <div class="container position-relative pb-5 pt-5">
+    {% if home_cfg.hero_kicker %}
+    <p class="text-uppercase small fw-semibold mb-2 text-white-50" style="letter-spacing: 0.14em;">{{ home_cfg.hero_kicker }}</p>
+    {% endif %}
+    <h1 class="cw-hero-title text-uppercase mb-3">{{ site_page.title }}</h1>
+    <p class="cw-hero-sub mb-4">
+      {% if site_page.intro %}{{ site_page.intro }}{% elif home_cfg.hero_intro_fallback %}{{ home_cfg.hero_intro_fallback }}{% endif %}
+    </p>
+    <div class="d-flex flex-wrap gap-2">
+      <a href="{% cw_href home_cfg.hero_cta_primary_link %}" class="btn btn-cw-accent btn-lg px-4">{{ home_cfg.hero_cta_primary_label }}</a>
+      {% if home_cfg.hero_cta_secondary_label %}
+      <a href="{% cw_href home_cfg.hero_cta_secondary_link %}" class="btn btn-outline-light btn-lg px-4">{{ home_cfg.hero_cta_secondary_label }}</a>
+      {% endif %}
+    </div>
+    {% if hero_icon_features %}
+    <div class="d-flex flex-wrap gap-4 mt-5 cw-value-bar pt-4">
+      {% for f in hero_icon_features %}
+      <div class="d-flex align-items-center gap-2 small">
+        <i class="{{ f.icon }} text-white fs-5" aria-hidden="true"></i>
+        <span>{% if f.title %}{{ f.title }}{% else %}{{ f.body }}{% endif %}</span>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+{% if sky_icon_features %}
+<section class="bg-cw-sky border-bottom py-4">
+  <div class="container">
+    <div class="row g-4 text-center text-md-start">
+      {% for f in sky_icon_features %}
+      <div class="col-md-4 d-flex gap-3 justify-content-center justify-content-md-start">
+        <i class="{{ f.icon }} fs-2 text-cw-navy" aria-hidden="true"></i>
+        <div>
+          {% if f.title %}<h2 class="h6 fw-bold text-cw-navy mb-1">{{ f.title }}</h2>{% endif %}
+          {% if f.body %}<p class="small text-muted mb-0">{{ f.body }}</p>{% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% if site_page.body %}
+<section class="py-5">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-9 text-center">
+        <div class="lead text-secondary">{{ site_page.body|linebreaksbr }}</div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<section class="py-5 cw-home-dest-section">
+  <div class="container">
+    <header class="text-center mb-5 mx-auto" style="max-width: 40rem;">
+      {% if home_cfg.destinations_kicker %}
+      <p class="cw-home-section-head__kicker mb-0">{{ home_cfg.destinations_kicker }}</p>
+      {% endif %}
+      {% if home_cfg.destinations_title %}
+      <h2 class="cw-home-section-head__title display-6 mt-2 mb-0">{{ home_cfg.destinations_title }}</h2>
+      {% endif %}
+    </header>
+    {% if destination_showcase %}
+    <div class="swiper cw-home-swiper cw-home-swiper--nav-lg cw-home-dest-swiper">
+      <div class="swiper-wrapper">
+        {% for d, img in destination_showcase %}
+        <div class="swiper-slide">
+          <a
+            href="{{ d.get_absolute_url }}"
+            class="cw-dest-card cw-home-dest-tile d-flex align-items-end text-white text-decoration-none position-relative h-100 {% if forloop.first %}cw-home-dest-tile--lead{% endif %}"
+            style="background-image: url('{{ img }}');"
+          >
+            {% if forloop.first %}
+            <span class="cw-home-dest-badge">Spotlight</span>
+            {% endif %}
+            <div class="cw-dest-label w-100 p-3 p-md-4 pt-5">
+              <span class="h5 fw-bold mb-0 d-block">{{ d.name }}</span>
+              {% if d.summary %}
+              <p class="small text-white-50 mb-0 mt-2 cw-line-clamp-2">{{ d.summary }}</p>
+              {% endif %}
+              <span class="d-inline-flex align-items-center gap-1 small fw-semibold text-white mt-3 opacity-90">
+                Explore hub <i class="bi bi-arrow-right-short fs-5" aria-hidden="true"></i>
+              </span>
+            </div>
+          </a>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="swiper-button-prev" aria-label="Previous destinations"></div>
+      <div class="swiper-button-next" aria-label="Next destinations"></div>
+      <div class="swiper-pagination"></div>
+    </div>
+    {% else %}
+    <div class="text-center py-5 px-4 cw-home-empty-soft">
+      <div class="cw-dest-empty-icon rounded-circle d-inline-flex align-items-center justify-content-center mb-3">
+        <i class="bi bi-globe2 text-cw-accent fs-3" aria-hidden="true"></i>
+      </div>
+      <p class="text-secondary mb-3">Add destinations in the admin to showcase them here.</p>
+      <a href="{% url 'destination_list' %}" class="btn btn-cw-accent rounded-pill px-4">{{ home_cfg.destinations_empty_cta_label }}</a>
+    </div>
+    {% endif %}
+    <div class="text-center mt-5">
+      <a href="{% url 'destination_list' %}" class="btn btn-outline-primary rounded-pill px-4">{{ home_cfg.destinations_view_all_label }}</a>
+    </div>
+  </div>
+</section>
+
+{% if home_cfg.video_enabled %}
+<section class="py-5 bg-light">
+  <div class="container">
+    <div class="row justify-content-center mb-4">
+      <div class="col-lg-8 text-center">
+        {% if home_cfg.video_title %}<h2 class="h3 fw-bold text-cw-navy">{{ home_cfg.video_title }}</h2>{% endif %}
+        {% if home_cfg.video_subtitle %}<p class="text-muted">{{ home_cfg.video_subtitle }}</p>{% endif %}
+      </div>
+    </div>
+    {% if home_cfg.video_poster_url %}
+    <div class="row justify-content-center">
+      <div class="col-lg-10">
+        <a href="{% cw_href home_cfg.video_watch_url %}" class="cw-video-poster ratio ratio-16x9 rounded-3 shadow d-flex align-items-center justify-content-center text-white text-decoration-none position-relative overflow-hidden" style="background-image: linear-gradient(rgba(15,40,65,0.5), rgba(15,40,65,0.6)), url('{{ home_cfg.video_poster_url }}');">
+          <span class="display-1"><i class="bi bi-play-circle-fill" aria-hidden="true"></i></span>
+        </a>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endif %}
+
+{% if gallery_images %}
+<section class="py-5">
+  <div class="container">
+    <div class="row align-items-center mb-4">
+      <div class="col-lg-8">
+        {% if home_cfg.community_title %}<h2 class="h3 fw-bold text-cw-navy mb-2">{{ home_cfg.community_title }}</h2>{% endif %}
+        {% if home_cfg.community_subtitle %}<p class="text-muted mb-0">{{ home_cfg.community_subtitle }}</p>{% endif %}
+        {% if home_cfg.community_hashtag %}<p class="small text-muted mt-2 mb-0">Tag <strong>{{ home_cfg.community_hashtag }}</strong> to be featured.</p>{% endif %}
+      </div>
+      <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+        {% if home_cfg.community_follow_url %}
+        <a href="{{ home_cfg.community_follow_url }}" class="btn btn-outline-dark btn-sm" rel="noopener noreferrer" target="_blank"><i class="bi bi-instagram me-1"></i>{{ home_cfg.community_follow_label }}</a>
+        {% endif %}
+      </div>
+    </div>
+    <div class="swiper cw-home-swiper cw-home-swiper--nav-lg cw-home-gallery-swiper">
+      <div class="swiper-wrapper">
+        {% for g in gallery_images %}
+        <div class="swiper-slide">
+          <div class="cw-ig-tile shadow-sm h-100" style="background-image: url('{{ g.image_url }}');" role="img" {% if g.alt_text %}aria-label="{{ g.alt_text }}"{% else %}aria-label="Gallery image"{% endif %}></div>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="swiper-button-prev" aria-label="Previous gallery images"></div>
+      <div class="swiper-button-next" aria-label="Next gallery images"></div>
+      <div class="swiper-pagination"></div>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% if testimonials %}
+<section class="py-5 bg-cw-sky">
+  <div class="container">
+    {% if home_cfg.testimonial_section_title %}
+    <h2 class="h3 fw-bold text-cw-navy text-center mb-4">{{ home_cfg.testimonial_section_title }}</h2>
+    {% endif %}
+    <div class="swiper cw-home-swiper cw-testimonial-swiper pb-5">
+      <div class="swiper-wrapper">
+        {% for t in testimonials %}
+        <div class="swiper-slide">
+          <div class="card border-0 shadow-sm mx-auto" style="max-width: 560px;">
+            <div class="card-body p-4 text-center">
+              <div class="text-warning mb-2" aria-hidden="true">
+                {% for _ in "12345" %}
+                {% if forloop.counter <= t.rating %}<i class="bi bi-star-fill"></i>{% endif %}
+                {% endfor %}
+              </div>
+              <p class="mb-3 fst-italic">“{{ t.quote }}”</p>
+              {% if t.author %}<p class="small text-muted mb-0">— {{ t.author }}</p>{% endif %}
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="swiper-pagination"></div>
+    </div>
+    {% if home_cfg.testimonial_footer_note %}
+    <p class="text-center text-muted small mb-0">
+      <i class="bi bi-patch-check-fill text-success me-1"></i>{{ home_cfg.testimonial_footer_note }}
+    </p>
+    {% endif %}
+  </div>
+</section>
+{% endif %}
+
+{% if promise_icon_features %}
+<section class="py-5">
+  <div class="container">
+    <div class="text-center mb-5">
+      {% if home_cfg.promise_section_title %}<h2 class="h3 fw-bold text-cw-navy">{{ home_cfg.promise_section_title }}</h2>{% endif %}
+      {% if home_cfg.promise_section_subtitle %}<p class="text-muted col-lg-8 mx-auto">{{ home_cfg.promise_section_subtitle }}</p>{% endif %}
+    </div>
+    <div class="row g-4 text-center">
+      {% for f in promise_icon_features %}
+      <div class="col-md-4">
+        <div class="rounded-circle bg-cw-sky text-cw-navy d-inline-flex align-items-center justify-content-center mb-3" style="width:4rem;height:4rem;">
+          <i class="{{ f.icon }} fs-3" aria-hidden="true"></i>
+        </div>
+        {% if f.title %}<h3 class="h6 fw-bold">{{ f.title }}</h3>{% endif %}
+        {% if f.body %}<p class="small text-muted mb-0">{{ f.body }}</p>{% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% if home_cfg.expert_title or home_cfg.expert_body or expert_bullets or home_cfg.expert_image_url %}
+<section class="py-5 bg-light">
+  <div class="container">
+    <div class="row g-4 align-items-center">
+      {% if home_cfg.expert_image_url %}
+      <div class="col-lg-6 order-lg-2">
+        <div class="ratio ratio-4x3 rounded-3 overflow-hidden shadow">
+          <img src="{{ home_cfg.expert_image_url }}" alt="{{ home_cfg.expert_image_alt }}" class="object-fit-cover w-100 h-100" loading="lazy" width="800" height="600">
+        </div>
+      </div>
+      {% endif %}
+      <div class="col-lg-{% if home_cfg.expert_image_url %}6{% else %}10 mx-auto{% endif %} order-lg-1">
+        {% if home_cfg.expert_title %}<h2 class="h3 fw-bold text-cw-navy">{{ home_cfg.expert_title }}</h2>{% endif %}
+        {% if home_cfg.expert_body %}<p class="text-muted">{{ home_cfg.expert_body }}</p>{% endif %}
+        {% if expert_bullets %}
+        <ul class="list-unstyled small text-secondary">
+          {% for b in expert_bullets %}
+          <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>{{ b.text }}</li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+        {% if home_cfg.expert_cta_label %}
+        <a href="{% cw_href home_cfg.expert_cta_link %}" class="btn btn-cw-accent mt-2">{{ home_cfg.expert_cta_label }}</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<section class="py-5 cw-home-blog-section border-top border-light">
+  <div class="container">
+    <div class="d-flex flex-column flex-lg-row flex-lg-wrap justify-content-lg-between align-items-lg-end gap-4 mb-5">
+      <header class="flex-grow-1" style="max-width: 36rem;">
+        {% if home_cfg.blog_section_title %}
+        <h2 class="cw-home-section-head__title h3 mb-2">{{ home_cfg.blog_section_title }}</h2>
+        {% endif %}
+        {% if home_cfg.blog_section_subtitle %}<p class="cw-home-section-head__sub mb-0">{{ home_cfg.blog_section_subtitle }}</p>{% endif %}
+      </header>
+      <a href="{% url 'blog_index' %}" class="btn btn-cw-accent rounded-pill px-4 align-self-lg-center text-nowrap">{{ home_cfg.blog_view_more_label }}</a>
+    </div>
+    {% if home_blog_posts %}
+    <div class="swiper cw-home-swiper cw-home-swiper--nav-lg cw-home-blog-swiper">
+      <div class="swiper-wrapper">
+        {% for p in home_blog_posts %}
+        <div class="swiper-slide">
+          <article class="cw-home-blog-card h-100 overflow-hidden d-flex flex-column">
+            <a href="{{ p.get_absolute_url }}" class="text-decoration-none text-reset d-flex flex-column h-100">
+              <div class="cw-home-blog-card__media flex-shrink-0">
+                {% if p.listing_image_url %}
+                <img src="{{ p.listing_image_url }}" alt="" loading="lazy" width="400" height="300">
+                {% elif site_settings.default_card_image_url %}
+                <img src="{{ site_settings.default_card_image_url }}" alt="" loading="lazy" width="400" height="300">
+                {% else %}
+                <img src="{% cycle 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=600&q=80' 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&q=80' 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=600&q=80' 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=600&q=80' %}" alt="" loading="lazy" width="400" height="300">
+                {% endif %}
+              </div>
+              <div class="p-4 d-flex flex-column flex-grow-1">
+                <div class="cw-home-blog-meta d-flex flex-wrap align-items-center gap-2 mb-2">
+                  <span class="badge rounded-pill cw-home-blog-scope">{{ p.get_scope_display }}</span>
+                  {% if p.published_at %}<time datetime="{{ p.published_at|date:'c' }}">{{ p.published_at|date:"M j, Y" }}</time>{% endif %}
+                </div>
+                <h3 class="h5 fw-bold text-cw-navy mb-2">{{ p.title }}</h3>
+                {% if p.excerpt %}<p class="small text-secondary cw-line-clamp-2 mb-3 flex-grow-1">{{ p.excerpt }}</p>{% else %}<div class="flex-grow-1"></div>{% endif %}
+                <span class="small fw-semibold text-cw-accent d-inline-flex align-items-center gap-1 mt-auto">
+                  Read article <i class="bi bi-arrow-up-right" aria-hidden="true"></i>
+                </span>
+              </div>
+            </a>
+          </article>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="swiper-button-prev" aria-label="Previous articles"></div>
+      <div class="swiper-button-next" aria-label="Next articles"></div>
+      <div class="swiper-pagination"></div>
+    </div>
+    {% else %}
+    <div class="text-center py-5 px-4 cw-home-empty-soft">
+      <div class="cw-dest-empty-icon rounded-circle d-inline-flex align-items-center justify-content-center mb-3">
+        <i class="bi bi-journal-text text-cw-accent fs-3" aria-hidden="true"></i>
+      </div>
+      <p class="text-secondary mb-0">No blog posts yet — add them in the admin.</p>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+{% include "website/includes/related_picks.html" %}
+<div class="container py-4">
+  {% if lead_form %}{% include "website/includes/lead_form.html" %}{% endif %}
+</div>
+{% endblock %}
+{% block extra_js %}
+{% if destination_showcase or home_blog_posts or gallery_images or testimonials %}
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    function slidesCount(root) {
+      return root ? root.querySelectorAll('.swiper-slide').length : 0;
+    }
+    document.querySelectorAll('.cw-home-dest-swiper').forEach(function (el) {
+      var n = slidesCount(el);
+      new Swiper(el, {
+        slidesPerView: 1.08,
+        spaceBetween: 16,
+        grabCursor: true,
+        watchOverflow: true,
+        loop: n > 4,
+        speed: 600,
+        keyboard: { enabled: true },
+        pagination: {
+          el: el.querySelector('.swiper-pagination'),
+          clickable: true,
+        },
+        navigation: {
+          prevEl: el.querySelector('.swiper-button-prev'),
+          nextEl: el.querySelector('.swiper-button-next'),
+        },
+        breakpoints: {
+          576: { slidesPerView: 1.35, spaceBetween: 18 },
+          768: { slidesPerView: 2.1, spaceBetween: 20 },
+          992: { slidesPerView: 2.75, spaceBetween: 22 },
+          1200: { slidesPerView: 3.25, spaceBetween: 24 },
+        },
+      });
+    });
+    document.querySelectorAll('.cw-home-blog-swiper').forEach(function (el) {
+      var n = slidesCount(el);
+      new Swiper(el, {
+        slidesPerView: 1.08,
+        spaceBetween: 16,
+        grabCursor: true,
+        watchOverflow: true,
+        loop: n > 4,
+        speed: 550,
+        keyboard: { enabled: true },
+        pagination: {
+          el: el.querySelector('.swiper-pagination'),
+          clickable: true,
+        },
+        navigation: {
+          prevEl: el.querySelector('.swiper-button-prev'),
+          nextEl: el.querySelector('.swiper-button-next'),
+        },
+        breakpoints: {
+          576: { slidesPerView: 1.35, spaceBetween: 16 },
+          768: { slidesPerView: 2.05, spaceBetween: 18 },
+          992: { slidesPerView: 2.85, spaceBetween: 20 },
+          1200: { slidesPerView: 3.5, spaceBetween: 22 },
+        },
+      });
+    });
+    document.querySelectorAll('.cw-home-gallery-swiper').forEach(function (el) {
+      var n = slidesCount(el);
+      new Swiper(el, {
+        slidesPerView: 2.4,
+        spaceBetween: 10,
+        grabCursor: true,
+        watchOverflow: true,
+        loop: n > 6,
+        speed: 450,
+        autoplay: n > 3 ? { delay: 2800, disableOnInteraction: false, pauseOnMouseEnter: true } : false,
+        keyboard: { enabled: true },
+        pagination: {
+          el: el.querySelector('.swiper-pagination'),
+          clickable: true,
+        },
+        navigation: {
+          prevEl: el.querySelector('.swiper-button-prev'),
+          nextEl: el.querySelector('.swiper-button-next'),
+        },
+        breakpoints: {
+          576: { slidesPerView: 3.2, spaceBetween: 12 },
+          768: { slidesPerView: 4.2, spaceBetween: 14 },
+          992: { slidesPerView: 5.2, spaceBetween: 16 },
+          1200: { slidesPerView: 6.2, spaceBetween: 18 },
+        },
+      });
+    });
+    document.querySelectorAll('.cw-testimonial-swiper').forEach(function (el) {
+      var pag = el.querySelector('.swiper-pagination');
+      new Swiper(el, {
+        loop: true,
+        autoplay: { delay: 6000, disableOnInteraction: false },
+        pagination: pag ? { el: pag, clickable: true } : undefined,
+      });
+    });
+  });
+</script>
+{% endif %}
+{% endblock %}

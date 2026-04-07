@@ -1,0 +1,193 @@
+<header class="cw-site-header sticky-top shadow-sm" style="z-index: 1030;">
+  <div class="cw-topbar">
+    <div class="container py-2 py-lg-3">
+      <div class="d-flex flex-column flex-lg-row align-items-stretch align-items-lg-center gap-2 gap-lg-3">
+        <div class="d-flex align-items-center justify-content-between min-w-0">
+          <a href="{% url 'home' %}" class="cw-header-brand text-decoration-none d-flex align-items-center gap-2 min-w-0">
+            <span class="cw-header-brand__mark d-flex align-items-center justify-content-center flex-shrink-0" aria-hidden="true">
+              <i class="bi bi-compass-fill"></i>
+            </span>
+            <span class="cw-header-brand__text text-truncate">{{ site_settings.site_name }}</span>
+          </a>
+          <div class="d-flex d-lg-none align-items-center gap-2 flex-shrink-0" role="navigation" aria-label="Quick actions">
+            <a href="{% url 'account_cart' %}" class="cw-header-icon-btn cw-header-icon-btn--cart position-relative" title="Tour shortlist" aria-label="Cart{% if cart_item_count %}, {{ cart_item_count }} items{% endif %}">
+              <i class="bi bi-bag" aria-hidden="true"></i>
+              {% if cart_item_count %}<span class="cw-header-badge">{{ cart_item_count }}</span>{% endif %}
+            </a>
+            <a href="{% url 'account_home' %}" class="cw-header-icon-btn" title="{% if user.is_authenticated %}My account{% else %}Log in{% endif %}" aria-label="{% if user.is_authenticated %}My account{% else %}Log in or sign up{% endif %}">
+              {% if user.is_authenticated %}
+              <i class="bi bi-person-circle" aria-hidden="true"></i>
+              {% else %}
+              <i class="bi bi-person" aria-hidden="true"></i>
+              {% endif %}
+            </a>
+          </div>
+        </div>
+
+        <form class="cw-header-search flex-lg-grow-1 mx-lg-auto" method="get" action="{% url 'search' %}" role="search" style="max-width: 36rem;">
+          <label class="visually-hidden" for="cw-global-search">Search site</label>
+          <div class="input-group cw-header-search__group">
+            <span class="input-group-text border-end-0 bg-transparent ps-3 rounded-start-pill"><i class="bi bi-search text-secondary" aria-hidden="true"></i></span>
+            <input
+              id="cw-global-search"
+              type="search"
+              name="q"
+              class="form-control border-start-0 ps-0"
+              placeholder="{{ site_settings.search_placeholder }}"
+              value="{{ request.GET.q|default:'' }}"
+              autocomplete="off"
+            >
+            <button type="submit" class="btn btn-cw-accent px-3 rounded-end-pill" aria-label="Search">
+              <span class="d-none d-sm-inline">Search</span><i class="bi bi-search d-sm-none" aria-hidden="true"></i>
+            </button>
+          </div>
+        </form>
+
+        <div class="d-none d-lg-flex align-items-center justify-content-end flex-wrap gap-2 flex-shrink-0 cw-header-toolbar" role="navigation" aria-label="Account and cart">
+          <a href="{% url 'account_cart' %}" class="btn btn-sm cw-header-btn-cart position-relative">
+            <i class="bi bi-bag me-1" aria-hidden="true"></i>Cart
+            {% if cart_item_count %}<span class="badge rounded-pill ms-1 cw-header-btn-cart__badge">{{ cart_item_count }}</span>{% endif %}
+          </a>
+
+          {% if user.is_authenticated %}
+          <div class="dropdown">
+            <button class="btn btn-sm cw-header-btn-account dropdown-toggle" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false" aria-label="Account menu">
+              <i class="bi bi-person-circle me-1" aria-hidden="true"></i>Account
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 py-2 cw-header-dropdown">
+              <li><a class="dropdown-item rounded-2" href="{% url 'account_home' %}">Overview</a></li>
+              <li><a class="dropdown-item rounded-2" href="{% url 'account_profile' %}">Profile &amp; settings</a></li>
+              <li><a class="dropdown-item rounded-2" href="{% url 'account_inquiries' %}">My inquiries</a></li>
+              <li><hr class="dropdown-divider my-2"></li>
+              <li>
+                <form method="post" action="{% url 'account_logout' %}" class="px-2 m-0">
+                  {% csrf_token %}
+                  <button type="submit" class="dropdown-item rounded-2 text-danger">Log out</button>
+                </form>
+              </li>
+            </ul>
+          </div>
+          {% else %}
+          <a href="{% url 'account_login' %}" class="btn btn-sm cw-header-btn-ghost">Log in</a>
+          <a href="{% url 'account_signup' %}" class="btn btn-sm btn-cw-accent rounded-pill px-3">Sign up</a>
+          {% endif %}
+
+          {% if site_settings.header_account_url %}
+          <a href="{{ site_settings.header_account_url }}" class="btn btn-sm btn-link text-secondary text-decoration-none small py-0" rel="noopener noreferrer">External account</a>
+          {% endif %}
+          {% if site_settings.header_cart_url %}
+          <a href="{{ site_settings.header_cart_url }}" class="btn btn-sm btn-link text-secondary text-decoration-none small py-0" rel="noopener noreferrer">External cart</a>
+          {% endif %}
+          {% if site_settings.header_locale_label %}<span class="small text-secondary ms-1">{{ site_settings.header_locale_label }}</span>{% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <nav class="navbar navbar-expand-lg navbar-dark cw-main-nav py-0">
+    <div class="container">
+      <button
+        class="navbar-toggler cw-main-nav__toggler border-0 shadow-none my-2"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#cwMainNav"
+        aria-controls="cwMainNav"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse pb-lg-0 cw-main-nav__collapse" id="cwMainNav">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0 py-lg-2 cw-main-nav__links">
+          {# Desktop: hover mega-menu for destinations #}
+          <li class="nav-item cw-nav-dest d-none d-lg-block position-relative">
+            <a href="{% url 'destination_list' %}" class="nav-link cw-main-nav__link cw-nav-dest__trigger d-inline-flex align-items-center gap-1">
+              <i class="bi bi-geo-alt d-inline" aria-hidden="true"></i>
+              <span>Destinations</span>
+              <i class="bi bi-chevron-down cw-nav-dest__caret small" aria-hidden="true"></i>
+            </a>
+            <div class="cw-nav-dest__panel shadow-lg" role="region" aria-label="Choose a destination">
+              <div class="cw-nav-dest__panel-head">
+                <span class="cw-nav-dest__panel-kicker">Explore</span>
+                <p class="cw-nav-dest__panel-title mb-0">Where to next?</p>
+              </div>
+              <div class="cw-nav-dest__grid">
+                {% for d in nav_destinations %}
+                <a href="{{ d.get_absolute_url }}" class="cw-nav-dest__card">{{ d.name }}</a>
+                {% endfor %}
+              </div>
+              <a href="{% url 'destination_list' %}" class="cw-nav-dest__all">
+                <span>View all destinations</span>
+                <i class="bi bi-arrow-right" aria-hidden="true"></i>
+              </a>
+            </div>
+          </li>
+          {# Mobile: collapsible destination list #}
+          <li class="nav-item d-lg-none">
+            <a class="nav-link cw-main-nav__link cw-nav-dest-mobile__toggle d-flex align-items-center justify-content-between" data-bs-toggle="collapse" href="#cwNavDestMenu" role="button" aria-expanded="false" aria-controls="cwNavDestMenu">
+              <span><i class="bi bi-geo-alt me-2" aria-hidden="true"></i>Destinations</span>
+              <i class="bi bi-chevron-down small cw-nav-dest-mobile__chev" aria-hidden="true"></i>
+            </a>
+            <div class="collapse cw-nav-dest-mobile" id="cwNavDestMenu">
+              <div class="cw-nav-dest-mobile__inner">
+                {% for d in nav_destinations %}
+                <a href="{{ d.get_absolute_url }}" class="cw-nav-dest-mobile__item">{{ d.name }}</a>
+                {% endfor %}
+                <a href="{% url 'destination_list' %}" class="cw-nav-dest-mobile__item cw-nav-dest-mobile__item--all">All destinations</a>
+              </div>
+            </div>
+          </li>
+
+          
+          <li class="nav-item">
+            <a class="nav-link cw-main-nav__link" href="{% url 'blog_index' %}">Blog</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link cw-main-nav__link" href="{% url 'about' %}">About</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link cw-main-nav__link" href="{% url 'contact' %}">Contact</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link cw-main-nav__link" href="{% url 'faqs' %}">FAQs</a>
+          </li>
+        </ul>
+        <ul class="navbar-nav ms-auto mb-2 mb-lg-0 py-lg-2 cw-navbar-account d-lg-none cw-main-nav__mobile-account">
+          <li class="nav-item">
+            <a class="nav-link cw-main-nav__link cw-main-nav__mobile-tile" href="{% url 'account_cart' %}"><i class="bi bi-bag me-2" aria-hidden="true"></i>Cart{% if cart_item_count %} <span class="badge bg-cw-accent ms-1">{{ cart_item_count }}</span>{% endif %}</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link cw-main-nav__link cw-main-nav__mobile-tile" href="{% url 'account_home' %}"><i class="bi bi-person me-2" aria-hidden="true"></i>Account</a>
+          </li>
+          {% if user.is_authenticated %}
+          <li class="nav-item">
+            <a class="nav-link cw-main-nav__link cw-main-nav__mobile-sub" href="{% url 'account_profile' %}"><i class="bi bi-gear me-2 opacity-75" aria-hidden="true"></i>Profile &amp; settings</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link cw-main-nav__link cw-main-nav__mobile-sub" href="{% url 'account_inquiries' %}"><i class="bi bi-chat-dots me-2 opacity-75" aria-hidden="true"></i>My inquiries</a>
+          </li>
+          <li class="nav-item px-3 pt-2 pb-1">
+            <form method="post" action="{% url 'account_logout' %}" class="m-0">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-outline-light btn-sm rounded-pill w-100">Log out</button>
+            </form>
+          </li>
+          {% else %}
+          <li class="nav-item">
+            <a class="nav-link cw-main-nav__link cw-main-nav__mobile-tile" href="{% url 'account_login' %}"><i class="bi bi-box-arrow-in-right me-2" aria-hidden="true"></i>Log in</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link cw-main-nav__link cw-main-nav__mobile-sub text-white-50" href="{% url 'account_signup' %}">Create account</a>
+          </li>
+          {% endif %}
+          {% if site_settings.header_account_url %}
+          <li class="nav-item"><a class="nav-link small text-white-50 py-2" href="{{ site_settings.header_account_url }}" rel="noopener noreferrer">External account</a></li>
+          {% endif %}
+          {% if site_settings.header_cart_url %}
+          <li class="nav-item"><a class="nav-link small text-white-50 py-2" href="{{ site_settings.header_cart_url }}" rel="noopener noreferrer">External cart</a></li>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+  </nav>
+</header>

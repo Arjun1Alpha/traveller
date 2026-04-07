@@ -1,0 +1,103 @@
+{% extends "website/base.html" %}
+{% block title %}Search{% if search_q %}: {{ search_q }}{% endif %} — {{ site_settings.site_name }}{% endblock %}
+{% block content %}
+<h1 class="mb-3">Search</h1>
+<form class="row g-2 mb-4" method="get" action="{% url 'search' %}" role="search">
+  <div class="col-md-8 col-lg-6">
+    <label class="visually-hidden" for="site-search-q">Search query</label>
+    <input
+      id="site-search-q"
+      type="search"
+      name="q"
+      class="form-control form-control-lg"
+      placeholder="Destinations, tours, blog posts…"
+      value="{{ search_q }}"
+      autocomplete="off"
+    >
+  </div>
+  <div class="col-auto d-flex align-items-stretch">
+    <button type="submit" class="btn btn-cw-accent text-white btn-lg px-4">Search</button>
+  </div>
+</form>
+
+{% if not search_q %}
+<p class="text-muted">Enter a term to search destinations, tours, blog posts, attractions, and things to do. Up to {{ search_limit }} matches are shown per category.</p>
+<p class="small text-muted mb-0">Tip: the site header search uses this same page.</p>
+{% elif total_matches == 0 %}
+<div class="alert alert-light border">
+  <p class="mb-2">No results for <strong>“{{ search_q }}”</strong>.</p>
+  <p class="small text-muted mb-0">Try different keywords, or <a href="{% url 'destination_list' %}">browse destinations</a> and the <a href="{% url 'blog_index' %}">blog</a>.</p>
+</div>
+{% else %}
+<p class="text-muted mb-4">About <strong>{{ total_matches }}</strong> match{{ total_matches|pluralize }} for <strong>“{{ search_q }}”</strong> (up to {{ search_limit }} per section).</p>
+
+{% if result_destinations %}
+<h2 class="h5 text-cw-navy border-bottom pb-2">Destinations</h2>
+<ul class="list-group list-group-flush shadow-sm rounded mb-4">
+  {% for d in result_destinations %}
+  <li class="list-group-item">
+    <a href="{{ d.get_absolute_url }}" class="fw-semibold text-cw-navy text-decoration-none">{{ d.name }}</a>
+    {% if d.summary %}<p class="small text-muted mb-0 mt-1">{{ d.summary|truncatewords:22 }}</p>{% endif %}
+  </li>
+  {% endfor %}
+</ul>
+{% endif %}
+
+{% if result_tours %}
+<h2 class="h5 text-cw-navy border-bottom pb-2">Tours</h2>
+<ul class="list-group list-group-flush shadow-sm rounded mb-4">
+  {% for t in result_tours %}
+  <li class="list-group-item d-flex flex-column flex-md-row justify-content-between gap-1">
+    <div>
+      <a href="{{ t.get_absolute_url }}" class="fw-semibold text-cw-navy text-decoration-none">{{ t.name }}</a>
+      <span class="text-muted small"> · {{ t.destination.name }}</span>
+      <p class="small text-muted mb-1 mt-1">
+        {% if t.price_from %}<span class="fw-semibold text-cw-navy">{{ t.currency }} {{ t.price_from|floatformat:0 }}+</span> · {% endif %}
+        <i class="bi bi-star-fill text-warning" aria-hidden="true"></i> {{ t.rating_average|floatformat:1 }} ({{ t.review_count }}) · {{ t.duration_hours|floatformat:1 }}h
+        {% if t.languages %} · {{ t.languages|truncatewords:6 }}{% endif %}
+      </p>
+      {% if t.teaser %}<p class="small text-muted mb-0">{{ t.teaser|truncatewords:20 }}</p>{% endif %}
+    </div>
+  </li>
+  {% endfor %}
+</ul>
+{% endif %}
+
+{% if result_blog_posts %}
+<h2 class="h5 text-cw-navy border-bottom pb-2">Blog</h2>
+<ul class="list-group list-group-flush shadow-sm rounded mb-4">
+  {% for p in result_blog_posts %}
+  <li class="list-group-item">
+    <a href="{{ p.get_absolute_url }}" class="fw-semibold text-cw-navy text-decoration-none">{{ p.title }}</a>
+    <span class="badge bg-cw-sky text-cw-navy ms-1">{{ p.get_scope_display }}</span>
+    {% if p.excerpt %}<p class="small text-muted mb-0 mt-1">{{ p.excerpt|truncatewords:24 }}</p>{% endif %}
+  </li>
+  {% endfor %}
+</ul>
+{% endif %}
+
+{% if result_attractions %}
+<h2 class="h5 text-cw-navy border-bottom pb-2">Attractions</h2>
+<ul class="list-group list-group-flush shadow-sm rounded mb-4">
+  {% for a in result_attractions %}
+  <li class="list-group-item">
+    <a href="{% url 'destination_attractions' a.destination.slug %}" class="fw-semibold text-cw-navy text-decoration-none">{{ a.name }}</a>
+    <span class="text-muted small"> · {{ a.destination.name }}</span>
+  </li>
+  {% endfor %}
+</ul>
+{% endif %}
+
+{% if result_things %}
+<h2 class="h5 text-cw-navy border-bottom pb-2">Things to do</h2>
+<ul class="list-group list-group-flush shadow-sm rounded mb-4">
+  {% for item in result_things %}
+  <li class="list-group-item">
+    <a href="{% url 'destination_things_to_do' item.destination.slug %}" class="fw-semibold text-cw-navy text-decoration-none">{{ item.name }}</a>
+    <span class="text-muted small"> · {{ item.destination.name }}</span>
+  </li>
+  {% endfor %}
+</ul>
+{% endif %}
+{% endif %}
+{% endblock %}

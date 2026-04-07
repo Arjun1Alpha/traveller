@@ -1,0 +1,44 @@
+{% extends "website/base.html" %}
+{% block title %}My inquiries — {{ site_settings.site_name }}{% endblock %}
+{% block content %}
+<nav class="mb-3" aria-label="Breadcrumb">
+  <ol class="breadcrumb small mb-0">
+    <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-decoration-none">Home</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Inquiries</li>
+  </ol>
+</nav>
+<h1 class="h3 fw-bold text-cw-navy mb-1">My inquiries</h1>
+<p class="text-secondary small mb-4">Messages you sent while signed in, plus tour questions from your account.</p>
+{% include "website/account/_nav.html" with account_nav="inquiries" %}
+{% if inquiries %}
+<div class="vstack gap-3">
+  {% for q in inquiries %}
+  <article class="card border-0 shadow-sm rounded-4">
+    <div class="card-body p-4">
+      <div class="d-flex flex-wrap justify-content-between gap-2 mb-2">
+        <span class="small text-muted">{{ q.created_at|date:"M j, Y, H:i" }}</span>
+        {% if q.source_page %}<span class="badge rounded-pill cw-tour-pdp-meta-pill cw-tour-pdp-meta-pill--muted">{{ q.source_page }}</span>{% endif %}
+      </div>
+      {% if q.related_tour %}
+      <p class="small mb-2"><strong>Tour:</strong> <a href="{{ q.related_tour.get_absolute_url }}" class="text-cw-accent text-decoration-none">{{ q.related_tour.name }}</a></p>
+      {% endif %}
+      {% if q.destination_interest %}
+      <p class="small text-muted mb-2"><strong>Destination:</strong> {{ q.destination_interest.name }}</p>
+      {% endif %}
+      {% if q.message %}
+      <p class="text-secondary mb-0">{{ q.message|linebreaksbr }}</p>
+      {% else %}
+      <p class="text-muted small fst-italic mb-0">(No message text)</p>
+      {% endif %}
+    </div>
+  </article>
+  {% endfor %}
+</div>
+{% else %}
+<div class="cw-home-empty-soft rounded-4 p-5 text-center">
+  <i class="bi bi-chat-dots text-cw-accent fs-2 d-block mb-3" aria-hidden="true"></i>
+  <p class="text-secondary mb-4">You have not sent any inquiries yet. Use <a href="{% url 'contact' %}">Contact</a> or ask a question from a tour page.</p>
+  <a href="{% url 'destination_list' %}" class="btn btn-outline-primary rounded-pill">Explore destinations</a>
+</div>
+{% endif %}
+{% endblock %}

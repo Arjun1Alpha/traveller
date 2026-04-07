@@ -1,0 +1,14 @@
+{% extends "website/base.html" %}
+{% block title %}Page not found — {{ site_settings.site_name }}{% endblock %}
+{% block content %}
+<div class="text-center py-5">
+  <h1 class="display-6 fw-bold text-cw-navy">404</h1>
+  <p class="lead text-muted">This page does not exist or has been moved.</p>
+  <div class="d-flex flex-wrap justify-content-center gap-2 mt-4">
+    <a href="{% url 'home' %}" class="btn btn-cw-accent text-white">Home</a>
+    <a href="{% url 'search' %}" class="btn btn-outline-primary">Search</a>
+    <a href="{% url 'destination_list' %}" class="btn btn-outline-primary">Destinations</a>
+    <a href="{% url 'contact' %}" class="btn btn-outline-secondary">Contact</a>
+  </div>
+</div>
+{% endblock %}

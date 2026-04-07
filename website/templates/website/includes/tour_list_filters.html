@@ -1,0 +1,80 @@
+<section class="cw-tour-filters card border-0 shadow-sm rounded-4 mb-4" aria-label="Filter tours">
+  <div class="card-body p-3 p-lg-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+      <h2 class="h6 fw-bold text-cw-navy mb-0">Find a tour</h2>
+      {% if tour_filters_active %}
+      <a href="{{ tour_filter_action }}" class="btn btn-sm btn-outline-secondary rounded-pill">Clear all</a>
+      {% endif %}
+    </div>
+    <form method="get" action="{{ tour_filter_action }}" class="row g-3 align-items-end">
+      <div class="col-12 col-md-6 col-xl-4">
+        <label class="form-label small text-muted mb-1" for="tour-filter-q">Search</label>
+        <input
+          type="search"
+          id="tour-filter-q"
+          name="q"
+          class="form-control rounded-3"
+          placeholder="Name, topic, language…"
+          value="{{ tour_filter_q }}"
+          autocomplete="off"
+        >
+      </div>
+      <div class="col-6 col-md-3 col-xl-2">
+        <label class="form-label small text-muted mb-1" for="tour-min-price">Min price</label>
+        <input type="text" inputmode="decimal" class="form-control rounded-3" id="tour-min-price" name="min_price" placeholder="0" value="{{ tour_filter_min_price }}">
+      </div>
+      <div class="col-6 col-md-3 col-xl-2">
+        <label class="form-label small text-muted mb-1" for="tour-max-price">Max price</label>
+        <input type="text" inputmode="decimal" class="form-control rounded-3" id="tour-max-price" name="max_price" placeholder="500" value="{{ tour_filter_max_price }}">
+      </div>
+      <div class="col-6 col-md-3 col-xl-2">
+        <label class="form-label small text-muted mb-1" for="tour-min-rating">Min rating</label>
+        <select class="form-select rounded-3" id="tour-min-rating" name="min_rating">
+          <option value="" {% if not tour_filter_min_rating %}selected{% endif %}>Any</option>
+          <option value="4.5" {% if tour_filter_min_rating == "4.5" %}selected{% endif %}>4.5+</option>
+          <option value="4.7" {% if tour_filter_min_rating == "4.7" %}selected{% endif %}>4.7+</option>
+          <option value="4.9" {% if tour_filter_min_rating == "4.9" %}selected{% endif %}>4.9+</option>
+        </select>
+      </div>
+      <div class="col-6 col-md-3 col-xl-2">
+        <label class="form-label small text-muted mb-1" for="tour-max-dur">Max hours</label>
+        <input type="text" inputmode="decimal" class="form-control rounded-3" id="tour-max-dur" name="max_duration" placeholder="8" value="{{ tour_filter_max_duration }}">
+      </div>
+      <div class="col-12 col-md-6 col-xl-3">
+        <label class="form-label small text-muted mb-1" for="tour-lang">Language</label>
+        <input type="search" class="form-control rounded-3" id="tour-lang" name="lang" placeholder="e.g. English, Spanish" value="{{ tour_filter_lang }}">
+      </div>
+      <div class="col-12 col-md-6 col-xl-3">
+        <label class="form-label small text-muted mb-1" for="tour-sort">Sort by</label>
+        <select class="form-select rounded-3" id="tour-sort" name="sort">
+          <option value="name" {% if tour_filter_sort == "name" %}selected{% endif %}>Name (A–Z)</option>
+          <option value="price_asc" {% if tour_filter_sort == "price_asc" %}selected{% endif %}>Price: low to high</option>
+          <option value="price_desc" {% if tour_filter_sort == "price_desc" %}selected{% endif %}>Price: high to low</option>
+          <option value="rating_desc" {% if tour_filter_sort == "rating_desc" %}selected{% endif %}>Highest rated</option>
+          <option value="reviews_desc" {% if tour_filter_sort == "reviews_desc" %}selected{% endif %}>Most reviewed</option>
+          <option value="duration_asc" {% if tour_filter_sort == "duration_asc" %}selected{% endif %}>Shortest first</option>
+          <option value="duration_desc" {% if tour_filter_sort == "duration_desc" %}selected{% endif %}>Longest first</option>
+        </select>
+      </div>
+      <div class="col-12">
+        <div class="d-flex flex-wrap gap-3 align-items-center">
+          <div class="form-check mb-0">
+            <input class="form-check-input" type="checkbox" name="free_cancel" value="1" id="tour-fc" {% if tour_filter_free_cancel %}checked{% endif %}>
+            <label class="form-check-label small" for="tour-fc">Free cancellation</label>
+          </div>
+          <div class="form-check mb-0">
+            <input class="form-check-input" type="checkbox" name="skip_line" value="1" id="tour-sk" {% if tour_filter_skip_line %}checked{% endif %}>
+            <label class="form-check-label small" for="tour-sk">Skip-the-line / timed entry</label>
+          </div>
+          <div class="form-check mb-0">
+            <input class="form-check-input" type="checkbox" name="accessible" value="1" id="tour-acc" {% if tour_filter_accessible %}checked{% endif %}>
+            <label class="form-check-label small" for="tour-acc">Wheelchair accessible</label>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 d-flex flex-wrap gap-2">
+        <button type="submit" class="btn btn-cw-accent rounded-pill px-4">Apply filters</button>
+      </div>
+    </form>
+  </div>
+</section>

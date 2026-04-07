@@ -1,0 +1,87 @@
+{% load i18n %}
+<div class="dashboard-stats row g-3 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="card border-0 shadow-sm h-100 dashboard-stat-card dashboard-stat-card--destinations">
+            <div class="card-body d-flex align-items-center justify-content-between gap-2">
+                <div>
+                    <div class="text-uppercase small text-white-50 fw-semibold">{% trans "Destinations" %}</div>
+                    <div class="display-6 fw-bold text-white mb-0">{{ counts.destinations }}</div>
+                </div>
+                <span class="dashboard-stat-icon"><i class="fas fa-globe-americas fa-2x"></i></span>
+            </div>
+            <a href="{{ links.destinations }}" class="stretched-link"><span class="visually-hidden">{% trans "Destinations" %}</span></a>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card border-0 shadow-sm h-100 dashboard-stat-card dashboard-stat-card--tours">
+            <div class="card-body d-flex align-items-center justify-content-between gap-2">
+                <div>
+                    <div class="text-uppercase small text-white-50 fw-semibold">{% trans "Tours" %}</div>
+                    <div class="display-6 fw-bold text-white mb-0">{{ counts.tours }}</div>
+                </div>
+                <span class="dashboard-stat-icon"><i class="fas fa-route fa-2x"></i></span>
+            </div>
+            <a href="{{ links.tours }}" class="stretched-link"><span class="visually-hidden">{% trans "Tours" %}</span></a>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card border-0 shadow-sm h-100 dashboard-stat-card dashboard-stat-card--blog">
+            <div class="card-body d-flex align-items-center justify-content-between gap-2">
+                <div>
+                    <div class="text-uppercase small text-white-50 fw-semibold">{% trans "Blog posts" %}</div>
+                    <div class="display-6 fw-bold text-white mb-0">{{ counts.blog_posts }}</div>
+                </div>
+                <span class="dashboard-stat-icon"><i class="fas fa-newspaper fa-2x"></i></span>
+            </div>
+            <a href="{{ links.blog_posts }}" class="stretched-link"><span class="visually-hidden">{% trans "Blog posts" %}</span></a>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card border-0 shadow-sm h-100 dashboard-stat-card dashboard-stat-card--leads">
+            <div class="card-body d-flex align-items-center justify-content-between gap-2">
+                <div>
+                    <div class="text-uppercase small text-white-50 fw-semibold">{% trans "Leads" %}</div>
+                    <div class="display-6 fw-bold text-white mb-0">{{ counts.leads }}</div>
+                </div>
+                <span class="dashboard-stat-icon"><i class="fas fa-inbox fa-2x"></i></span>
+            </div>
+            <a href="{{ links.leads }}" class="stretched-link"><span class="visually-hidden">{% trans "Leads" %}</span></a>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-4">
+        <div class="card border-0 shadow-sm h-100 dashboard-stat-card dashboard-stat-card--reviews">
+            <div class="card-body d-flex align-items-center justify-content-between gap-2">
+                <div>
+                    <div class="text-uppercase small text-white-50 fw-semibold">{% trans "Testimonials" %}</div>
+                    <div class="display-6 fw-bold text-white mb-0">{{ counts.testimonials }}</div>
+                </div>
+                <span class="dashboard-stat-icon"><i class="fas fa-star fa-2x"></i></span>
+            </div>
+            <a href="{{ links.testimonials }}" class="stretched-link"><span class="visually-hidden">{% trans "Testimonials" %}</span></a>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-4">
+        <div class="card border-0 shadow-sm h-100 dashboard-stat-card dashboard-stat-card--sights">
+            <div class="card-body d-flex align-items-center justify-content-between gap-2">
+                <div>
+                    <div class="text-uppercase small text-white-50 fw-semibold">{% trans "Attractions" %}</div>
+                    <div class="display-6 fw-bold text-white mb-0">{{ counts.attractions }}</div>
+                </div>
+                <span class="dashboard-stat-icon"><i class="fas fa-landmark fa-2x"></i></span>
+            </div>
+            <a href="{{ links.attractions }}" class="stretched-link"><span class="visually-hidden">{% trans "Attractions" %}</span></a>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-4">
+        <div class="card border-0 shadow-sm h-100 dashboard-stat-card dashboard-stat-card--activities">
+            <div class="card-body d-flex align-items-center justify-content-between gap-2">
+                <div>
+                    <div class="text-uppercase small text-white-50 fw-semibold">{% trans "Things to do" %}</div>
+                    <div class="display-6 fw-bold text-white mb-0">{{ counts.things_to_do }}</div>
+                </div>
+                <span class="dashboard-stat-icon"><i class="fas fa-hiking fa-2x"></i></span>
+            </div>
+            <a href="{{ links.things_to_do }}" class="stretched-link"><span class="visually-hidden">{% trans "Things to do" %}</span></a>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,5 @@
+<nav class="cw-account-nav d-flex flex-wrap gap-2 mb-4 pb-3 border-bottom border-light" aria-label="Account">
+  <a href="{% url 'account_profile' %}" class="btn btn-sm {% if account_nav == 'profile' %}btn-cw-accent{% else %}btn-outline-secondary{% endif %} rounded-pill">Profile</a>
+  <a href="{% url 'account_cart' %}" class="btn btn-sm {% if account_nav == 'cart' %}btn-cw-accent{% else %}btn-outline-secondary{% endif %} rounded-pill">Cart{% if cart_item_count %} <span class="badge bg-cw-navy ms-1">{{ cart_item_count }}</span>{% endif %}</a>
+  <a href="{% url 'account_inquiries' %}" class="btn btn-sm {% if account_nav == 'inquiries' %}btn-cw-accent{% else %}btn-outline-secondary{% endif %} rounded-pill">My inquiries</a>
+</nav>

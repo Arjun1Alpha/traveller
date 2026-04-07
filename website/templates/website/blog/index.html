@@ -1,0 +1,80 @@
+{% extends "website/base.html" %}
+{% block title %}Blog{% if blog_search_q %}: {{ blog_search_q }}{% endif %} — {{ site_settings.site_name }}{% endblock %}
+{% block content %}
+<h1 class="mb-3 text-black">Blog</h1>
+
+<form class="row g-2 mb-4" method="get" action="{% url 'blog_index' %}" role="search">
+  <div class="col-md-8 col-lg-6">
+    <label class="visually-hidden" for="blog-search">Search blog</label>
+    <input
+      id="blog-search"
+      type="search"
+      name="q"
+      class="form-control"
+      placeholder="Search posts by title or content…"
+      value="{{ blog_search_q|default:'' }}"
+      autocomplete="off"
+    >
+  </div>
+  <div class="col-auto">
+    <button type="submit" class="btn btn-cw-accent text-white">Search</button>
+    {% if blog_search_q %}
+    <a href="{% url 'blog_index' %}" class="btn btn-outline-secondary">Clear</a>
+    {% endif %}
+  </div>
+</form>
+
+<h2 class="h5 mb-3">{% if blog_search_q %}Results{% else %}Recent posts{% endif %}</h2>
+{% if posts %}
+<div class="row g-4">
+  {% for p in posts %}
+  <div class="col-md-6 col-lg-4">
+    <article class="card h-100 border-0 shadow-sm cw-card-hover overflow-hidden">
+      <div class="ratio ratio-16x9 bg-light">
+        {% if p.listing_image_url %}
+        <img src="{{ p.listing_image_url }}" alt="" class="object-fit-cover w-100 h-100" loading="lazy" width="640" height="360">
+        {% elif site_settings.default_card_image_url %}
+        <img src="{{ site_settings.default_card_image_url }}" alt="" class="object-fit-cover w-100 h-100" loading="lazy" width="640" height="360">
+        {% else %}
+        <div class="d-flex align-items-center justify-content-center h-100 text-muted small">No image</div>
+        {% endif %}
+      </div>
+      <div class="card-body">
+        <span class="badge bg-cw-sky text-cw-navy mb-2">{{ p.get_scope_display }}</span>
+        <h3 class="h6 card-title">
+          <a href="{{ p.get_absolute_url }}" class="stretched-link text-decoration-none text-cw-navy">{{ p.title }}</a>
+        </h3>
+        {% if p.excerpt %}<p class="card-text small text-muted mb-0">{{ p.excerpt|truncatewords:28 }}</p>{% endif %}
+      </div>
+    </article>
+  </div>
+  {% endfor %}
+</div>
+
+{% if page_obj.has_other_pages %}
+<nav class="mt-4" aria-label="Blog pagination">
+  <ul class="pagination justify-content-center flex-wrap mb-0">
+    {% if page_obj.has_previous %}
+    <li class="page-item">
+      <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if blog_search_q %}&q={{ blog_search_q|urlencode }}{% endif %}">Previous</a>
+    </li>
+    {% else %}
+    <li class="page-item disabled"><span class="page-link">Previous</span></li>
+    {% endif %}
+    <li class="page-item disabled"><span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span></li>
+    {% if page_obj.has_next %}
+    <li class="page-item">
+      <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if blog_search_q %}&q={{ blog_search_q|urlencode }}{% endif %}">Next</a>
+    </li>
+    {% else %}
+    <li class="page-item disabled"><span class="page-link">Next</span></li>
+    {% endif %}
+  </ul>
+</nav>
+{% endif %}
+{% elif blog_search_q %}
+<p class="text-muted">No posts match <strong>“{{ blog_search_q }}”</strong>. <a href="{% url 'blog_index' %}">Clear search</a> or try <a href="{% url 'search' %}?q={{ blog_search_q|urlencode }}">site-wide search</a>.</p>
+{% else %}
+<p class="text-muted">No posts yet. Add blog posts in the admin (set scope and country/city slugs for filtered pages).</p>
+{% endif %}
+{% endblock %}

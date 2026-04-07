@@ -1,0 +1,28 @@
+{% if testimonials %}
+<section id="cw-entity-reviews" class="cw-entity-section cw-entity-testimonials rounded-4 overflow-hidden mb-5" aria-label="Testimonials">
+  <div class="row g-0">
+    <div class="col-lg-4 cw-hub-testimonials__rail d-flex flex-column justify-content-center p-4 p-lg-5">
+      <p class="text-uppercase small fw-bold cw-hub-testimonials__label mb-2">{{ rail_kicker|default:"Traveler voices" }}</p>
+      <h2 class="h4 fw-bold text-white mb-3">{{ rail_title|default:"What guests say" }}</h2>
+      {% if rail_subtitle %}
+      <p class="text-white-50 small mb-0">{{ rail_subtitle }}</p>
+      {% endif %}
+    </div>
+    <div class="col-lg-8 cw-hub-testimonials__swiper-wrap p-3 p-lg-4">
+      <div class="cw-entity-testimonial-scroll d-flex gap-3">
+        {% for t in testimonials %}
+        <figure class="cw-entity-quote-card flex-shrink-0 mb-0">
+          <blockquote class="cw-hub-quote__text mb-3">“{{ t.quote }}”</blockquote>
+          <div class="text-warning mb-2" aria-hidden="true">
+            {% for _ in "12345" %}
+            {% if forloop.counter <= t.rating %}<i class="bi bi-star-fill"></i>{% endif %}
+            {% endfor %}
+          </div>
+          {% if t.author %}<figcaption class="small fw-semibold text-cw-navy mb-0">— {{ t.author }}</figcaption>{% endif %}
+        </figure>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endif %}

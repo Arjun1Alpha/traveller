@@ -1,0 +1,56 @@
+{% extends "website/base.html" %}
+{% block title %}Sign up — {{ site_settings.site_name }}{% endblock %}
+{% block content %}
+<nav class="mb-3" aria-label="Breadcrumb">
+  <ol class="breadcrumb small mb-0">
+    <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-decoration-none">Home</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Sign up</li>
+  </ol>
+</nav>
+<div class="row justify-content-center">
+  <div class="col-md-7 col-lg-6">
+    <h1 class="h3 fw-bold text-cw-navy mb-2">Create an account</h1>
+    <p class="text-secondary small mb-4">Save tours, send inquiries, and build a shortlist — no payment on this demo site.</p>
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+    {% endif %}
+    <form method="post" class="card border-0 shadow-sm rounded-4">
+      {% csrf_token %}
+      {% if request.GET.next %}
+      <input type="hidden" name="next" value="{{ request.GET.next }}">
+      {% endif %}
+      <div class="card-body p-4">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label small fw-semibold" for="{{ form.first_name.id_for_label }}">First name</label>
+            {{ form.first_name }}
+            {% if form.first_name.errors %}<div class="invalid-feedback d-block">{{ form.first_name.errors }}</div>{% endif %}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small fw-semibold" for="{{ form.last_name.id_for_label }}">Last name</label>
+            {{ form.last_name }}
+            {% if form.last_name.errors %}<div class="invalid-feedback d-block">{{ form.last_name.errors }}</div>{% endif %}
+          </div>
+          <div class="col-12">
+            <label class="form-label small fw-semibold" for="{{ form.email.id_for_label }}">Email</label>
+            {{ form.email }}
+            {% if form.email.errors %}<div class="invalid-feedback d-block">{{ form.email.errors }}</div>{% endif %}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small fw-semibold" for="{{ form.password1.id_for_label }}">Password</label>
+            {{ form.password1 }}
+            {% if form.password1.errors %}<div class="invalid-feedback d-block">{{ form.password1.errors }}</div>{% endif %}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small fw-semibold" for="{{ form.password2.id_for_label }}">Confirm password</label>
+            {{ form.password2 }}
+            {% if form.password2.errors %}<div class="invalid-feedback d-block">{{ form.password2.errors }}</div>{% endif %}
+          </div>
+        </div>
+        <button type="submit" class="btn btn-cw-accent rounded-pill mt-4">Create account</button>
+      </div>
+    </form>
+    <p class="text-center small text-secondary mt-3 mb-0">Already have an account? <a href="{% url 'account_login' %}">Log in</a></p>
+  </div>
+</div>
+{% endblock %}

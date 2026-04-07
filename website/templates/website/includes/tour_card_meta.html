@@ -1,0 +1,37 @@
+{# Tour booking row for cards — expects `t` as Tour #}
+<div class="cw-tour-card-meta d-flex flex-wrap align-items-center gap-2 mb-2">
+  {% if t.price_from %}
+  <span class="cw-tour-card-meta__price fw-bold text-cw-navy">{{ t.currency }}&nbsp;{{ t.price_from|floatformat:0 }}<span class="fw-normal text-secondary small">+</span></span>
+  {% else %}
+  <span class="cw-tour-card-meta__price small text-secondary">Ask for price</span>
+  {% endif %}
+  <span class="cw-tour-card-meta__rating text-secondary small" title="Average rating">
+    <i class="bi bi-star-fill text-warning" aria-hidden="true"></i>
+    {{ t.rating_average|floatformat:1 }}
+    <span class="text-muted">({{ t.review_count }})</span>
+  </span>
+  <span class="cw-tour-card-meta__dur text-secondary small">
+    <i class="bi bi-clock" aria-hidden="true"></i>
+    {{ t.duration_hours|floatformat:1 }}&nbsp;h
+  </span>
+  {% if t.group_size_max %}
+  <span class="cw-tour-card-meta__grp text-secondary small">
+    <i class="bi bi-people" aria-hidden="true"></i>
+    Max&nbsp;{{ t.group_size_max }}
+  </span>
+  {% endif %}
+</div>
+{% if t.languages %}
+<p class="small text-muted mb-2 mb-md-0 cw-line-clamp-1"><i class="bi bi-translate me-1" aria-hidden="true"></i>{{ t.languages }}</p>
+{% endif %}
+<div class="d-flex flex-wrap gap-1 mb-0">
+  {% if t.skip_the_line %}
+  <span class="badge rounded-pill cw-tour-badge cw-tour-badge--skip">Skip the line</span>
+  {% endif %}
+  {% if t.free_cancellation %}
+  <span class="badge rounded-pill cw-tour-badge cw-tour-badge--calm">Free cancellation</span>
+  {% endif %}
+  {% if t.wheelchair_accessible %}
+  <span class="badge rounded-pill cw-tour-badge cw-tour-badge--calm">Accessible</span>
+  {% endif %}
+</div>

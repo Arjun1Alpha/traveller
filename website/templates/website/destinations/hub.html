@@ -1,0 +1,334 @@
+{% extends "website/base.html" %}
+{% block title %}{{ destination.name }} — {{ site_settings.site_name }}{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+{% endblock %}
+{% block layout %}
+<section
+  class="cw-hub-hero position-relative text-white d-flex align-items-end"
+  style="min-height: min(52vh, 520px); background: center/cover no-repeat url('{{ hub_hero_image_url }}');"
+>
+  <div class="position-absolute top-0 start-0 w-100 h-100 cw-hub-hero__overlay"></div>
+  <div class="container position-relative pb-4 pb-md-5 pt-5">
+    <nav class="small mb-3" aria-label="Breadcrumb">
+      <ol class="breadcrumb cw-hub-breadcrumb mb-0">
+        <li class="breadcrumb-item"><a href="{% url 'destination_list' %}" class="text-white-50 text-decoration-none">Destinations</a></li>
+        <li class="breadcrumb-item active text-white" aria-current="page">{{ destination.name }}</li>
+      </ol>
+    </nav>
+    <p class="text-uppercase small fw-semibold text-white-50 mb-2 cw-hub-hero__kicker">City hub</p>
+    <h1 class="cw-hub-hero__title mb-3">{{ destination.name }}</h1>
+    {% if destination.summary %}
+    <p class="cw-hub-hero__lead mb-4 col-lg-8 px-0">{{ destination.summary }}</p>
+    {% endif %}
+    <div class="d-flex flex-wrap gap-2 mb-4">
+      <span class="cw-hub-stat-pill"><i class="bi bi-signpost-split me-1" aria-hidden="true"></i>{{ destination.category_count }} categor{{ destination.category_count|pluralize:"y,ies" }}</span>
+      <span class="cw-hub-stat-pill"><i class="bi bi-compass me-1" aria-hidden="true"></i>{{ destination.tour_count }} tour{{ destination.tour_count|pluralize }}</span>
+      <span class="cw-hub-stat-pill"><i class="bi bi-camera me-1" aria-hidden="true"></i>{{ destination.attraction_count }} sight{{ destination.attraction_count|pluralize }}</span>
+      <span class="cw-hub-stat-pill"><i class="bi bi-stars me-1" aria-hidden="true"></i>{{ destination.thing_count }} to-do{{ destination.thing_count|pluralize }}</span>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+      <a href="{% url 'tour_list' destination.slug %}" class="btn btn-cw-accent btn-lg px-4">Browse tours</a>
+      <a href="{% url 'destination_categories' destination.slug %}" class="btn btn-outline-light btn-lg px-4">Explore categories</a>
+    </div>
+  </div>
+</section>
+
+<div class="container py-4 py-lg-5 cw-page cw-hub-page">
+  {% block content %}
+  <div class="cw-hub-quickgrid row g-3 g-lg-4 mb-5">
+    <div class="col-6 col-lg-3">
+      <a href="{% url 'destination_categories' destination.slug %}" class="cw-hub-quickcard h-100 text-decoration-none">
+        <div class="cw-hub-quickcard__icon"><i class="bi bi-grid-1x2-fill" aria-hidden="true"></i></div>
+        <h2 class="h6 fw-bold text-cw-navy mb-1">Categories</h2>
+        <p class="small text-secondary mb-0">Themed groupings &amp; tour types</p>
+      </a>
+    </div>
+    <div class="col-6 col-lg-3">
+      <a href="{% url 'tour_list' destination.slug %}" class="cw-hub-quickcard h-100 text-decoration-none">
+        <div class="cw-hub-quickcard__icon"><i class="bi bi-map-fill" aria-hidden="true"></i></div>
+        <h2 class="h6 fw-bold text-cw-navy mb-1">Tours</h2>
+        <p class="small text-secondary mb-0">Guided experiences &amp; tickets</p>
+      </a>
+    </div>
+    <div class="col-6 col-lg-3">
+      <a href="{% url 'destination_attractions' destination.slug %}" class="cw-hub-quickcard h-100 text-decoration-none">
+        <div class="cw-hub-quickcard__icon"><i class="bi bi-camera-fill" aria-hidden="true"></i></div>
+        <h2 class="h6 fw-bold text-cw-navy mb-1">Attractions</h2>
+        <p class="small text-secondary mb-0">Icons, museums &amp; monuments</p>
+      </a>
+    </div>
+    <div class="col-6 col-lg-3">
+      <a href="{% url 'destination_things_to_do' destination.slug %}" class="cw-hub-quickcard h-100 text-decoration-none">
+        <div class="cw-hub-quickcard__icon"><i class="bi bi-stars" aria-hidden="true"></i></div>
+        <h2 class="h6 fw-bold text-cw-navy mb-1">Things to do</h2>
+        <p class="small text-secondary mb-0">Local picks &amp; ideas</p>
+      </a>
+    </div>
+  </div>
+
+  {% if dest_categories %}
+  <section class="cw-hub-panel mb-5">
+    <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+      <div>
+        <p class="cw-home-section-head__kicker mb-1">Browse by theme</p>
+        <h2 class="h4 fw-bold text-cw-navy mb-0">Categories in {{ destination.name }}</h2>
+      </div>
+      <a href="{% url 'destination_categories' destination.slug %}" class="btn btn-sm btn-outline-primary rounded-pill">View all</a>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+      {% for c in dest_categories %}
+      <a href="{{ c.get_absolute_url }}" class="cw-hub-chip">{{ c.name }}</a>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  <section class="mb-5">
+    <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+      <div>
+        <p class="cw-home-section-head__kicker mb-1">Top experiences</p>
+        <h2 class="h4 fw-bold text-cw-navy mb-0">Featured tours</h2>
+      </div>
+      <a href="{% url 'tour_list' destination.slug %}" class="btn btn-sm btn-cw-accent rounded-pill px-3">All tours</a>
+    </div>
+    {% if dest_tours %}
+    <div class="row g-4">
+      {% for t in dest_tours %}
+      <div class="col-md-6 col-xl-4">
+        <article class="cw-hub-tour-card cw-tour-grid-card h-100 position-relative">
+          <a href="{{ t.get_absolute_url }}" class="stretched-link text-decoration-none" aria-labelledby="hub-tour-{{ t.id }}"></a>
+          <div class="cw-hub-tour-card__media-wrap ratio ratio-4x3 position-relative">
+            {% if t.listing_image_url %}
+            <img
+              src="{{ t.listing_image_url }}"
+              alt=""
+              loading="lazy"
+              width="800"
+              height="600"
+              referrerpolicy="no-referrer"
+              class="cw-hub-tour-card__cover"
+              onerror="this.classList.add('d-none'); this.nextElementSibling.classList.add('is-visible');"
+            >
+            <div class="cw-hub-tour-card__img-fallback cw-tour-grid-card__media--ph position-absolute top-0 start-0 w-100 h-100" aria-hidden="true">
+              <i class="bi bi-image fs-2"></i>
+            </div>
+            {% else %}
+            <div class="cw-tour-grid-card__media--ph cw-hub-tour-card__ph-fill position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" aria-hidden="true">
+              <i class="bi bi-compass fs-1"></i>
+            </div>
+            {% endif %}
+            <div class="cw-hub-tour-card__overlay">
+              <div class="cw-hub-tour-card__overlay-chips">
+                {% if t.price_from %}
+                <span class="cw-hub-tour-card__chip cw-hub-tour-card__chip--price">{{ t.currency }}&nbsp;{{ t.price_from|floatformat:0 }}+</span>
+                {% endif %}
+                <span class="cw-hub-tour-card__chip cw-hub-tour-card__chip--rating">
+                  <i class="bi bi-star-fill" aria-hidden="true"></i>
+                  {{ t.rating_average|floatformat:1 }}
+                  <span class="cw-hub-tour-card__chip-reviews">({{ t.review_count }})</span>
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="cw-hub-tour-card__accent"></div>
+          <div class="cw-hub-tour-card__body">
+            {% if t.category %}
+            <span class="cw-hub-tour-card__cat">{{ t.category.name }}</span>
+            {% endif %}
+            <h3 class="h6 fw-bold text-cw-navy mb-2" id="hub-tour-{{ t.id }}">{{ t.name }}</h3>
+            {% include "website/includes/tour_card_meta_featured.html" with t=t hub_overlay=True %}
+            {% if t.teaser %}<p class="small text-secondary cw-line-clamp-2 cw-hub-tour-card__teaser mb-0">{{ t.teaser }}</p>{% endif %}
+            <span class="cw-hub-tour-card__cta small fw-semibold text-cw-accent">View details <i class="bi bi-arrow-up-right" aria-hidden="true"></i></span>
+          </div>
+        </article>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="cw-hub-empty rounded-4 p-4 text-center text-secondary">
+      <i class="bi bi-compass fs-2 text-cw-accent d-block mb-2" aria-hidden="true"></i>
+      <p class="mb-0">No tours listed yet — check back soon or explore another city.</p>
+    </div>
+    {% endif %}
+  </section>
+
+  <div class="row g-4 g-xl-5 mb-5">
+    <div class="col-lg-6">
+      <section class="cw-hub-split h-100">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h2 class="h5 fw-bold text-cw-navy mb-0"><i class="bi bi-camera text-cw-accent me-2" aria-hidden="true"></i>Attractions</h2>
+          <a href="{% url 'destination_attractions' destination.slug %}" class="small fw-semibold text-cw-accent text-decoration-none">See all</a>
+        </div>
+        {% if dest_attractions %}
+        <ul class="list-unstyled cw-hub-mini-list mb-0">
+          {% for a in dest_attractions %}
+          <li class="cw-hub-mini-list__item">
+            <span class="cw-hub-mini-list__dot" aria-hidden="true"></span>
+            <a href="{{ a.get_absolute_url }}" class="fw-semibold text-cw-navy text-decoration-none">{{ a.name }}</a>
+            {% if a.summary %}<span class="d-block small text-secondary mt-1 cw-line-clamp-2">{{ a.summary }}</span>{% endif %}
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <p class="text-secondary small mb-0">No attractions yet.</p>
+        {% endif %}
+      </section>
+    </div>
+    <div class="col-lg-6">
+      <section class="cw-hub-split cw-hub-split--alt h-100">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h2 class="h5 fw-bold text-cw-navy mb-0"><i class="bi bi-stars text-cw-accent me-2" aria-hidden="true"></i>Things to do</h2>
+          <a href="{% url 'destination_things_to_do' destination.slug %}" class="small fw-semibold text-cw-accent text-decoration-none">See all</a>
+        </div>
+        {% if dest_things %}
+        <ul class="list-unstyled cw-hub-mini-list mb-0">
+          {% for item in dest_things %}
+          <li class="cw-hub-mini-list__item">
+            <span class="cw-hub-mini-list__dot cw-hub-mini-list__dot--gold" aria-hidden="true"></span>
+            <a href="{{ item.get_absolute_url }}" class="fw-semibold text-cw-navy text-decoration-none">{{ item.name }}</a>
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <p class="text-secondary small mb-0">No activities listed yet.</p>
+        {% endif %}
+      </section>
+    </div>
+  </div>
+
+  {% if related_blog_posts %}
+  <section class="cw-hub-blog-wrap mb-5">
+    <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+      <div>
+        <p class="cw-home-section-head__kicker mb-1">Guides &amp; stories</p>
+        <h2 class="h4 fw-bold text-cw-navy mb-0">Blog: {{ destination.name }}</h2>
+      </div>
+      <a href="{% url 'blog_index' %}" class="btn btn-sm btn-outline-primary rounded-pill">Full blog</a>
+    </div>
+    <div class="swiper cw-home-swiper cw-home-swiper--nav-lg cw-hub-blog-swiper">
+      <div class="swiper-wrapper">
+        {% for p in related_blog_posts %}
+        <div class="swiper-slide">
+          <article class="cw-home-blog-card h-100 overflow-hidden d-flex flex-column">
+            <a href="{{ p.get_absolute_url }}" class="text-decoration-none text-reset d-flex flex-column h-100">
+              <div class="cw-home-blog-card__media flex-shrink-0">
+                {% if p.listing_image_url %}
+                <img src="{{ p.listing_image_url }}" alt="" loading="lazy" width="400" height="300">
+                {% elif site_settings.default_card_image_url %}
+                <img src="{{ site_settings.default_card_image_url }}" alt="" loading="lazy" width="400" height="300">
+                {% else %}
+                <img src="{% cycle 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=600&q=80' 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&q=80' 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=600&q=80' %}" alt="" loading="lazy" width="400" height="300">
+                {% endif %}
+              </div>
+              <div class="p-4 d-flex flex-column flex-grow-1">
+                <div class="cw-home-blog-meta d-flex flex-wrap align-items-center gap-2 mb-2">
+                  <span class="badge rounded-pill cw-home-blog-scope">{{ p.get_scope_display }}</span>
+                  {% if p.published_at %}<time datetime="{{ p.published_at|date:'c' }}">{{ p.published_at|date:"M j, Y" }}</time>{% endif %}
+                </div>
+                <h3 class="h6 fw-bold text-cw-navy mb-2">{{ p.title }}</h3>
+                {% if p.excerpt %}<p class="small text-secondary cw-line-clamp-2 mb-0 flex-grow-1">{{ p.excerpt }}</p>{% endif %}
+                <span class="small fw-semibold text-cw-accent d-inline-flex align-items-center gap-1 mt-3">Read <i class="bi bi-arrow-up-right" aria-hidden="true"></i></span>
+              </div>
+            </a>
+          </article>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="swiper-button-prev" aria-label="Previous articles"></div>
+      <div class="swiper-button-next" aria-label="Next articles"></div>
+      <div class="swiper-pagination"></div>
+    </div>
+  </section>
+  {% endif %}
+
+  {% if destination_testimonials %}
+  <section class="cw-hub-testimonials rounded-4 overflow-hidden mb-5">
+    <div class="row g-0">
+      <div class="col-lg-4 cw-hub-testimonials__rail d-flex flex-column justify-content-center p-4 p-lg-5">
+        <p class="text-uppercase small fw-bold cw-hub-testimonials__label mb-2">Traveler voices</p>
+        <h2 class="h4 fw-bold text-white mb-3">Loved by guests worldwide</h2>
+        <p class="text-white-50 small mb-0">Real feedback from people who explore with us — including trips like yours in {{ destination.name }}.</p>
+      </div>
+      <div class="col-lg-8 cw-hub-testimonials__swiper-wrap p-3 p-lg-4">
+        <div class="swiper cw-home-swiper cw-hub-testimonial-swiper pb-4">
+          <div class="swiper-wrapper">
+            {% for t in destination_testimonials %}
+            <div class="swiper-slide">
+              <figure class="cw-hub-quote h-100 mb-0">
+                <blockquote class="cw-hub-quote__text mb-3">“{{ t.quote }}”</blockquote>
+                <div class="text-warning mb-2" aria-hidden="true">
+                  {% for _ in "12345" %}
+                  {% if forloop.counter <= t.rating %}<i class="bi bi-star-fill"></i>{% endif %}
+                  {% endfor %}
+                </div>
+                {% if t.author %}<figcaption class="small fw-semibold text-cw-navy mb-0">— {{ t.author }}</figcaption>{% endif %}
+              </figure>
+            </div>
+            {% endfor %}
+          </div>
+          <div class="swiper-pagination"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+  {% endif %}
+
+  <div class="cw-hub-footer-cta rounded-4 p-4 p-md-5 text-center text-md-start">
+    <div class="row align-items-center g-4">
+      <div class="col-md-8">
+        <h2 class="h5 fw-bold text-cw-navy mb-2">Plan your {{ destination.name }} trip</h2>
+        <p class="text-secondary small mb-0">Browse tours, read guides, and compare cities — or jump back to the full destination list.</p>
+      </div>
+      <div class="col-md-4 text-md-end">
+        <a href="{% url 'destination_list' %}" class="btn btn-outline-primary rounded-pill px-4">All destinations</a>
+      </div>
+    </div>
+  </div>
+  {% endblock %}
+</div>
+{% endblock %}
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    function slidesCount(root) {
+      return root ? root.querySelectorAll('.swiper-slide').length : 0;
+    }
+    document.querySelectorAll('.cw-hub-blog-swiper').forEach(function (el) {
+      var n = slidesCount(el);
+      new Swiper(el, {
+        slidesPerView: 1.08,
+        spaceBetween: 16,
+        grabCursor: true,
+        watchOverflow: true,
+        loop: n > 3,
+        speed: 550,
+        keyboard: { enabled: true },
+        pagination: {
+          el: el.querySelector('.swiper-pagination'),
+          clickable: true,
+        },
+        navigation: {
+          prevEl: el.querySelector('.swiper-button-prev'),
+          nextEl: el.querySelector('.swiper-button-next'),
+        },
+        breakpoints: {
+          576: { slidesPerView: 1.35, spaceBetween: 16 },
+          768: { slidesPerView: 2.05, spaceBetween: 18 },
+          992: { slidesPerView: 2.65, spaceBetween: 20 },
+          1200: { slidesPerView: 3.15, spaceBetween: 22 },
+        },
+      });
+    });
+    document.querySelectorAll('.cw-hub-testimonial-swiper').forEach(function (el) {
+      var pag = el.querySelector('.swiper-pagination');
+      new Swiper(el, {
+        loop: true,
+        autoplay: { delay: 5500, disableOnInteraction: false },
+        pagination: pag ? { el: pag, clickable: true } : undefined,
+      });
+    });
+  });
+</script>
+{% endblock %}

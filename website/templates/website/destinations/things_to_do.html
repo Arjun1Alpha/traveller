@@ -1,0 +1,93 @@
+{% extends "website/base.html" %}
+{% block title %}Things to do — {{ destination.name }} — {{ site_settings.site_name }}{% endblock %}
+{% block content %}
+<nav class="mb-3" aria-label="Breadcrumb">
+  <ol class="breadcrumb small mb-0">
+    <li class="breadcrumb-item"><a href="{% url 'destination_list' %}" class="text-decoration-none">Destinations</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'destination_hub' destination.slug %}" class="text-decoration-none">{{ destination.name }}</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Things to do</li>
+  </ol>
+</nav>
+
+<div class="cw-things-hero cw-page-hero rounded-4 overflow-hidden mb-4 mb-lg-5">
+  <div class="p-4 p-lg-5">
+    <div class="row align-items-lg-end g-4">
+      <div class="col-lg-7">
+        <p class="cw-home-section-head__kicker mb-2">Local life &amp; ideas</p>
+        <h1 class="cw-home-section-head__title display-6 mb-3">Things to do in {{ destination.name }}</h1>
+        <p class="text-secondary mb-0 lead fs-6">Activities, neighborhoods, food, and experiences — filter by keyword or explore everything below.</p>
+      </div>
+      <div class="col-lg-5">
+        <form method="get" action="{% url 'destination_things_to_do' destination.slug %}" role="search">
+          <label class="visually-hidden" for="things-q">Search things to do</label>
+          <div class="input-group cw-hero-search bg-white">
+            <span class="input-group-text border-0 bg-transparent text-muted"><i class="bi bi-search" aria-hidden="true"></i></span>
+            <input
+              id="things-q"
+              type="search"
+              name="q"
+              value="{{ things_search_q|default:'' }}"
+              class="form-control border-0 shadow-none"
+              placeholder="Search activities…"
+              autocomplete="off"
+            >
+            <button class="btn btn-cw-accent px-4 rounded-pill me-1 my-1" type="submit">Search</button>
+          </div>
+          {% if things_search_q %}
+          <div class="mt-2 text-end"><a href="{% url 'destination_things_to_do' destination.slug %}" class="small text-decoration-none">Clear</a></div>
+          {% endif %}
+        </form>
+      </div>
+    </div>
+    <div class="cw-page-hero__footer">
+      {% include "website/includes/entity_tagging_strip.html" with destination=destination blog_posts=listing_blog_posts testimonials=listing_testimonials %}
+    </div>
+  </div>
+</div>
+
+{% if things %}
+<div class="row g-4">
+  {% for item in things %}
+  <div class="col-md-6 col-xl-4">
+    <article class="cw-spot-card cw-spot-card--things h-100 position-relative">
+      <a href="{{ item.get_absolute_url }}" class="stretched-link text-decoration-none text-reset" aria-labelledby="thing-card-{{ item.id }}"></a>
+      <div class="cw-spot-card__accent cw-spot-card__accent--things" aria-hidden="true"></div>
+      <div class="cw-spot-card__icon cw-spot-card__icon--things" aria-hidden="true"><i class="bi bi-stars"></i></div>
+      <h2 class="h5 fw-bold text-cw-navy mb-2" id="thing-card-{{ item.id }}">{{ item.name }}</h2>
+      {% if item.summary %}
+      <p class="small text-secondary cw-line-clamp-4 mb-0">{{ item.summary }}</p>
+      {% else %}
+      <p class="small text-muted fst-italic mb-0">Add to your {{ destination.name }} itinerary.</p>
+      {% endif %}
+      <span class="small fw-semibold text-cw-accent d-inline-flex align-items-center gap-1 mt-3">Details <i class="bi bi-arrow-up-right" aria-hidden="true"></i></span>
+    </article>
+  </div>
+  {% endfor %}
+</div>
+{% elif things_search_q %}
+<div class="cw-home-empty-soft rounded-4 p-5 text-center">
+  <i class="bi bi-search text-cw-accent fs-2 d-block mb-3" aria-hidden="true"></i>
+  <p class="text-secondary mb-3">Nothing matches “{{ things_search_q }}”.</p>
+  <a href="{% url 'destination_things_to_do' destination.slug %}" class="btn btn-cw-accent rounded-pill">Show all</a>
+</div>
+{% else %}
+<div class="cw-home-empty-soft rounded-4 p-5 text-center">
+  <i class="bi bi-calendar-event text-cw-accent fs-2 d-block mb-3" aria-hidden="true"></i>
+  <p class="text-secondary mb-4">Nothing listed yet.</p>
+  <a href="{% url 'destination_hub' destination.slug %}" class="btn btn-outline-primary rounded-pill">Back to hub</a>
+</div>
+{% endif %}
+
+{% include "website/includes/entity_gallery_section.html" with gallery_images=listing_gallery_images section_title="Activity gallery" %}
+
+{% with blog_title="Ideas for things to do in "|add:destination.name %}
+{% include "website/includes/entity_blog_section.html" with blog_posts=listing_blog_posts section_kicker="From the blog" section_title=blog_title %}
+{% endwith %}
+
+{% include "website/includes/entity_testimonials_section.html" with testimonials=listing_testimonials rail_subtitle="Moments from activities like these — tagged or from our global travelers." %}
+
+<div class="mt-5 pt-4 border-top border-light d-flex flex-wrap gap-3 justify-content-between align-items-center">
+  <a href="{% url 'destination_hub' destination.slug %}" class="text-decoration-none text-secondary small"><i class="bi bi-arrow-left me-1" aria-hidden="true"></i>{{ destination.name }} hub</a>
+  <a href="{% url 'destination_attractions' destination.slug %}" class="text-decoration-none text-cw-accent small fw-semibold">Attractions</a>
+</div>
+{% endblock %}

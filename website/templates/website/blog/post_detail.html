@@ -1,0 +1,172 @@
+{% extends "website/base.html" %}
+{% block title %}{{ post.title }} — {{ site_settings.site_name }}{% endblock %}
+{% block content %}
+<nav class="mb-3" aria-label="Breadcrumb">
+  <ol class="breadcrumb small mb-0">
+    <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-decoration-none">Home</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'blog_index' %}" class="text-decoration-none">Blog</a></li>
+    {% if post.scope == "city" and post.city_slug %}
+    <li class="breadcrumb-item"><a href="{% url 'blog_city' post.city_slug %}" class="text-decoration-none">{{ post.city_slug|title }}</a></li>
+    {% elif post.scope == "country" and post.country_slug %}
+    <li class="breadcrumb-item"><a href="{% url 'blog_country' post.country_slug %}" class="text-decoration-none">{{ post.country_slug|title }}</a></li>
+    {% endif %}
+    <li class="breadcrumb-item active text-truncate" aria-current="page" style="max-width: 14rem;">{{ post.title }}</li>
+  </ol>
+</nav>
+
+<article class="cw-blog-pdp mb-5">
+  <header class="cw-blog-pdp-hero rounded-4 overflow-hidden mb-4 mb-lg-5 position-relative text-white">
+    {% if post.listing_image_url %}
+    <div class="cw-blog-pdp-hero__bg" style="background-image: url('{{ post.listing_image_url }}');" role="img" aria-label=""></div>
+    {% else %}
+    <div class="cw-blog-pdp-hero__bg cw-blog-pdp-hero__bg--fallback" aria-hidden="true"></div>
+    {% endif %}
+    <div class="cw-blog-pdp-hero__scrim"></div>
+    <div class="position-relative p-4 p-lg-5">
+      <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+        <span class="cw-blog-pdp-pill">{{ post.get_scope_display }}</span>
+        {% if post.published_at %}<span class="cw-blog-pdp-pill cw-blog-pdp-pill--muted"><i class="bi bi-calendar3 me-1" aria-hidden="true"></i>{{ post.published_at|date:"M j, Y" }}</span>{% endif %}
+        {% if post.scope == "city" and post.city_slug %}
+        <a href="{% url 'blog_city' post.city_slug %}" class="cw-blog-pdp-pill cw-blog-pdp-pill--link text-decoration-none">City stories</a>
+        {% elif post.scope == "country" and post.country_slug %}
+        <a href="{% url 'blog_country' post.country_slug %}" class="cw-blog-pdp-pill cw-blog-pdp-pill--link text-decoration-none">Country guide</a>
+        {% endif %}
+      </div>
+      <h1 class="cw-blog-pdp-title mb-0 col-lg-10 px-0">{{ post.title }}</h1>
+      {% if post.excerpt %}
+      <p class="cw-blog-pdp-lead text-white-80 mb-0 mt-3 col-lg-9 px-0">{{ post.excerpt }}</p>
+      {% endif %}
+    </div>
+  </header>
+
+  <div class="row g-4 g-xl-5">
+    <div class="col-lg-8">
+      {% if post.body %}
+      <div class="cw-blog-pdp-body text-secondary">
+        {{ post.body|linebreaks }}
+      </div>
+      {% else %}
+      <p class="text-muted fst-italic">Full article text coming soon.</p>
+      {% endif %}
+    </div>
+    <div class="col-lg-4">
+      <aside class="cw-blog-pdp-aside" aria-label="Related places and tours">
+        {% if post.related_destinations.all %}
+        <section class="cw-blog-pdp-aside__block card border-0 shadow-sm rounded-4 mb-4">
+          <div class="card-body p-4">
+            <h2 class="h6 fw-bold text-cw-navy mb-3"><i class="bi bi-geo-alt-fill text-cw-accent me-2" aria-hidden="true"></i>Destinations</h2>
+            <ul class="list-unstyled mb-0 cw-blog-pdp-aside__list">
+              {% for d in post.related_destinations.all %}
+              <li class="mb-3">
+                <a href="{{ d.get_absolute_url }}" class="cw-blog-pdp-dest d-flex gap-3 text-decoration-none rounded-3 p-2">
+                  {% if d.listing_image_url %}
+                  <span class="cw-blog-pdp-dest__img rounded-2 flex-shrink-0" style="background-image: url('{{ d.listing_image_url }}');" role="img" aria-label=""></span>
+                  {% else %}
+                  <span class="cw-blog-pdp-dest__img cw-blog-pdp-dest__img--ph rounded-2 flex-shrink-0 d-flex align-items-center justify-content-center" aria-hidden="true"><i class="bi bi-compass text-cw-accent"></i></span>
+                  {% endif %}
+                  <span class="min-w-0">
+                    <span class="fw-semibold text-cw-navy d-block">{{ d.name }}</span>
+                    <span class="small text-muted">Hub · tours · sights</span>
+                  </span>
+                </a>
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </section>
+        {% endif %}
+
+        {% if post.related_tours.all %}
+        <section class="cw-blog-pdp-aside__block card border-0 shadow-sm rounded-4 mb-4">
+          <div class="card-body p-4">
+            <h2 class="h6 fw-bold text-cw-navy mb-3"><i class="bi bi-ticket-perforated text-cw-accent me-2" aria-hidden="true"></i>Tours in this story</h2>
+            <ul class="list-unstyled mb-0">
+              {% for t in post.related_tours.all %}
+              <li class="mb-2">
+                <a href="{{ t.get_absolute_url }}" class="d-block text-decoration-none rounded-3 px-2 py-2 cw-blog-pdp-tour-link">
+                  <span class="fw-semibold text-cw-navy small">{{ t.name }}</span>
+                  <span class="d-block small text-muted">{{ t.destination.name }}</span>
+                </a>
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </section>
+        {% endif %}
+
+        {% if post.related_categories.all or post.related_attractions.all or post.related_things_to_do.all %}
+        <section class="cw-blog-pdp-aside__block card border-0 shadow-sm rounded-4 mb-4">
+          <div class="card-body p-4">
+            <h2 class="h6 fw-bold text-cw-navy mb-3"><i class="bi bi-signpost-split text-cw-accent me-2" aria-hidden="true"></i>Also tagged</h2>
+            {% if post.related_categories.all %}
+            <p class="small text-uppercase text-muted fw-semibold mb-2">Categories</p>
+            <div class="d-flex flex-wrap gap-1 mb-3">
+              {% for c in post.related_categories.all %}
+              <a href="{{ c.get_absolute_url }}" class="badge rounded-pill text-decoration-none cw-blog-pdp-chip">{{ c.name }}</a>
+              {% endfor %}
+            </div>
+            {% endif %}
+            {% if post.related_attractions.all %}
+            <p class="small text-uppercase text-muted fw-semibold mb-2">Attractions</p>
+            <ul class="small mb-3 ps-3">
+              {% for a in post.related_attractions.all %}
+              <li class="mb-1"><a href="{{ a.get_absolute_url }}" class="text-decoration-none">{{ a.name }}</a></li>
+              {% endfor %}
+            </ul>
+            {% endif %}
+            {% if post.related_things_to_do.all %}
+            <p class="small text-uppercase text-muted fw-semibold mb-2">Things to do</p>
+            <ul class="small mb-0 ps-3">
+              {% for th in post.related_things_to_do.all %}
+              <li class="mb-1"><a href="{{ th.get_absolute_url }}" class="text-decoration-none">{{ th.name }}</a></li>
+              {% endfor %}
+            </ul>
+            {% endif %}
+          </div>
+        </section>
+        {% endif %}
+
+        <div class="d-grid gap-2">
+          <a href="{% url 'blog_index' %}" class="btn btn-outline-secondary rounded-pill btn-sm"><i class="bi bi-journal-text me-1" aria-hidden="true"></i>All blog posts</a>
+          <a href="{% url 'search' %}" class="btn btn-outline-primary rounded-pill btn-sm"><i class="bi bi-search me-1" aria-hidden="true"></i>Search the site</a>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  {% if related_reading %}
+  <section class="mt-5 pt-4 border-top border-light" aria-labelledby="cw-blog-related-heading">
+    <div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-4">
+      <div>
+        <p class="small text-uppercase text-muted fw-semibold mb-1 cw-blog-pdp-section-kicker">Keep reading</p>
+        <h2 class="h4 fw-bold text-cw-navy mb-0" id="cw-blog-related-heading">Related articles</h2>
+      </div>
+    </div>
+    <div class="row g-4">
+      {% for p in related_reading %}
+      <div class="col-md-6 col-xl-4">
+        <article class="card h-100 border-0 shadow-sm cw-card-hover overflow-hidden rounded-4">
+          <div class="ratio ratio-16x9 bg-light">
+            {% if p.listing_image_url %}
+            <img src="{{ p.listing_image_url }}" alt="" class="object-fit-cover w-100 h-100" loading="lazy" width="640" height="360">
+            {% elif site_settings.default_card_image_url %}
+            <img src="{{ site_settings.default_card_image_url }}" alt="" class="object-fit-cover w-100 h-100" loading="lazy" width="640" height="360">
+            {% else %}
+            <span class="d-flex align-items-center justify-content-center h-100 text-muted small">No image</span>
+            {% endif %}
+          </div>
+          <div class="card-body">
+            <span class="badge bg-cw-sky text-cw-navy mb-2 small">{{ p.get_scope_display }}</span>
+            <h3 class="h6 card-title mb-2">
+              <a href="{{ p.get_absolute_url }}" class="stretched-link text-decoration-none text-cw-navy">{{ p.title }}</a>
+            </h3>
+            {% if p.excerpt %}<p class="card-text small text-muted mb-0">{{ p.excerpt|truncatewords:22 }}</p>{% endif %}
+          </div>
+        </article>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+</article>
+{% endblock %}

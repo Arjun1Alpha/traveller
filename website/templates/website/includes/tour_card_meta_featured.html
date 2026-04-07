@@ -1,0 +1,65 @@
+{# Hub featured cards. Pass hub_overlay=True when price/rating sit on the image. #}
+{% with rc=t.review_count %}
+<div class="cw-tour-meta-featured{% if hub_overlay %} cw-tour-meta-featured--under-overlay{% endif %}">
+  {% if not hub_overlay %}
+  <div class="cw-tour-meta-featured__hero">
+    {% if t.price_from %}
+    <div class="cw-tour-meta-featured__price-block">
+      <span class="cw-tour-meta-featured__currency">{{ t.currency }}</span>
+      <span class="cw-tour-meta-featured__amount">{{ t.price_from|floatformat:0 }}</span>
+      <span class="cw-tour-meta-featured__suffix">+</span>
+      <span class="cw-tour-meta-featured__per">per person</span>
+    </div>
+    {% else %}
+    <p class="cw-tour-meta-featured__price-muted mb-0">Price on request</p>
+    {% endif %}
+    <div class="cw-tour-meta-featured__rating-block">
+      <span class="cw-tour-meta-featured__star" aria-hidden="true"><i class="bi bi-star-fill"></i></span>
+      <span class="cw-tour-meta-featured__rating-val">{{ t.rating_average|floatformat:1 }}</span>
+      <span class="cw-tour-meta-featured__review-line">{{ rc }} review{{ rc|pluralize }}</span>
+    </div>
+  </div>
+  {% endif %}
+  {% if hub_overlay %}
+  <p class="cw-tour-meta-featured__facts-inline mb-0">
+    <span><i class="bi bi-clock" aria-hidden="true"></i>{{ t.duration_hours|floatformat:1 }}&nbsp;h</span>
+    {% if t.group_size_max %}
+    <span class="cw-tour-meta-featured__facts-dot">·</span>
+    <span><i class="bi bi-people" aria-hidden="true"></i>Max&nbsp;{{ t.group_size_max }}</span>
+    {% endif %}
+  </p>
+  {% else %}
+  <ul class="cw-tour-meta-featured__facts list-unstyled mb-0">
+    <li>
+      <i class="bi bi-clock" aria-hidden="true"></i>
+      <span>{{ t.duration_hours|floatformat:1 }}-hour experience</span>
+    </li>
+    {% if t.group_size_max %}
+    <li>
+      <i class="bi bi-people" aria-hidden="true"></i>
+      <span>Groups up to {{ t.group_size_max }}</span>
+    </li>
+    {% endif %}
+  </ul>
+  {% endif %}
+  {% if t.languages %}
+  <p class="cw-tour-meta-featured__langs mb-0{% if hub_overlay %} cw-tour-meta-featured__langs--compact{% endif %}">
+    <i class="bi bi-translate" aria-hidden="true"></i>
+    {{ t.languages }}
+  </p>
+  {% endif %}
+  {% if t.skip_the_line or t.free_cancellation or t.wheelchair_accessible %}
+  <div class="cw-tour-meta-featured__badges{% if hub_overlay %} cw-tour-meta-featured__badges--compact{% endif %}">
+    {% if t.skip_the_line %}
+    <span class="cw-tour-meta-featured__chip">Skip the line</span>
+    {% endif %}
+    {% if t.free_cancellation %}
+    <span class="cw-tour-meta-featured__chip">Free cancellation</span>
+    {% endif %}
+    {% if t.wheelchair_accessible %}
+    <span class="cw-tour-meta-featured__chip">Accessible</span>
+    {% endif %}
+  </div>
+  {% endif %}
+</div>
+{% endwith %}

@@ -1,0 +1,108 @@
+{% extends "website/base.html" %}
+{% block title %}{{ category.name }} — {{ destination.name }} — {{ site_settings.site_name }}{% endblock %}
+{% block content %}
+<nav class="mb-3" aria-label="Breadcrumb">
+  <ol class="breadcrumb small mb-0">
+    <li class="breadcrumb-item"><a href="{% url 'destination_list' %}" class="text-decoration-none">Destinations</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'destination_hub' destination.slug %}" class="text-decoration-none">{{ destination.name }}</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'destination_categories' destination.slug %}" class="text-decoration-none">Categories</a></li>
+    <li class="breadcrumb-item active" aria-current="page">{{ category.name }}</li>
+  </ol>
+</nav>
+
+<div class="cw-cat-detail-hero cw-page-hero rounded-4 overflow-hidden mb-4 mb-lg-5">
+  <div class="cw-cat-detail-hero__inner p-4 p-lg-5">
+    <div class="row align-items-lg-end g-4">
+      <div class="col-lg-10">
+        <p class="cw-home-section-head__kicker mb-2">{{ destination.name }}</p>
+        <h1 class="cw-home-section-head__title display-6 mb-3">{{ category.name }}</h1>
+        {% if category.summary %}
+        <p class="text-secondary mb-2 fs-6">{{ category.summary }}</p>
+        {% endif %}
+        <p class="text-secondary mb-0 small">Use filters below to narrow by price, rating, duration, and more.</p>
+      </div>
+    </div>
+    <div class="cw-page-hero__footer">
+      {% include "website/includes/entity_tagging_strip.html" with destination=destination category=category blog_posts=category_blog_posts testimonials=page_testimonials %}
+    </div>
+  </div>
+</div>
+
+{% include "website/includes/tour_list_filters.html" %}
+
+{% if tours %}
+<div class="row g-4 mb-4 mb-lg-5">
+  {% for t in tours %}
+  <div class="col-md-6 col-xl-4">
+    <article class="cw-hub-tour-card cw-tour-grid-card h-100 position-relative">
+      <a href="{{ t.get_absolute_url }}" class="stretched-link text-decoration-none" aria-labelledby="cat-tour-{{ t.id }}"></a>
+      <div class="cw-hub-tour-card__media-wrap ratio ratio-4x3 position-relative">
+        {% if t.listing_image_url %}
+        <img
+          src="{{ t.listing_image_url }}"
+          alt=""
+          loading="lazy"
+          width="800"
+          height="600"
+          referrerpolicy="no-referrer"
+          class="cw-hub-tour-card__cover"
+          onerror="this.classList.add('d-none'); this.nextElementSibling.classList.add('is-visible');"
+        >
+        <div class="cw-hub-tour-card__img-fallback cw-tour-grid-card__media--ph position-absolute top-0 start-0 w-100 h-100" aria-hidden="true">
+          <i class="bi bi-image fs-2"></i>
+        </div>
+        {% else %}
+        <div class="cw-tour-grid-card__media--ph cw-hub-tour-card__ph-fill position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" aria-hidden="true">
+          <i class="bi bi-compass fs-1"></i>
+        </div>
+        {% endif %}
+        <div class="cw-hub-tour-card__overlay">
+          <div class="cw-hub-tour-card__overlay-chips">
+            {% if t.price_from %}
+            <span class="cw-hub-tour-card__chip cw-hub-tour-card__chip--price">{{ t.currency }}&nbsp;{{ t.price_from|floatformat:0 }}+</span>
+            {% endif %}
+            <span class="cw-hub-tour-card__chip cw-hub-tour-card__chip--rating">
+              <i class="bi bi-star-fill" aria-hidden="true"></i>
+              {{ t.rating_average|floatformat:1 }}
+              <span class="cw-hub-tour-card__chip-reviews">({{ t.review_count }})</span>
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="cw-hub-tour-card__accent"></div>
+      <div class="cw-hub-tour-card__body">
+        <span class="cw-hub-tour-card__cat">{{ category.name }}</span>
+        <h2 class="h6 fw-bold text-cw-navy mb-2" id="cat-tour-{{ t.id }}">{{ t.name }}</h2>
+        {% include "website/includes/tour_card_meta_featured.html" with t=t hub_overlay=True %}
+        {% if t.teaser %}<p class="small text-secondary cw-line-clamp-2 cw-hub-tour-card__teaser mb-0">{{ t.teaser }}</p>{% endif %}
+        <span class="cw-hub-tour-card__cta small fw-semibold text-cw-accent">View details <i class="bi bi-arrow-up-right" aria-hidden="true"></i></span>
+      </div>
+    </article>
+  </div>
+  {% endfor %}
+</div>
+{% elif tour_filters_active %}
+<div class="cw-home-empty-soft rounded-4 p-5 text-center">
+  <i class="bi bi-funnel text-cw-accent fs-2 d-block mb-3" aria-hidden="true"></i>
+  <p class="text-secondary mb-3">No tours in <strong>{{ category.name }}</strong> match your filters{% if tour_search_q %} or search{% endif %}.</p>
+  <a href="{{ category.get_absolute_url }}" class="btn btn-cw-accent rounded-pill">Reset filters</a>
+</div>
+{% else %}
+<div class="cw-home-empty-soft rounded-4 p-5 text-center">
+  <i class="bi bi-compass text-cw-accent fs-2 d-block mb-3" aria-hidden="true"></i>
+  <p class="text-secondary mb-4">No tours in this category yet.</p>
+  <a href="{% url 'destination_categories' destination.slug %}" class="btn btn-outline-primary rounded-pill">Other categories</a>
+</div>
+{% endif %}
+
+{% include "website/includes/entity_gallery_section.html" with gallery_images=category_gallery_images section_title="Gallery" %}
+
+{% include "website/includes/entity_blog_section.html" with blog_posts=category_blog_posts section_kicker="Guides & stories" section_title="Blog for this category" %}
+
+{% include "website/includes/entity_testimonials_section.html" with testimonials=page_testimonials rail_subtitle="Reviews tagged for this category, plus favorites from across our trips." %}
+
+<div class="mt-5 pt-4 border-top border-light d-flex flex-wrap gap-3 justify-content-between align-items-center">
+  <a href="{% url 'destination_categories' destination.slug %}" class="text-decoration-none text-secondary small"><i class="bi bi-arrow-left me-1" aria-hidden="true"></i>All categories</a>
+  <a href="{% url 'tour_list' destination.slug %}" class="text-decoration-none text-cw-accent small fw-semibold">Browse all {{ destination.name }} tours</a>
+</div>
+{% endblock %}

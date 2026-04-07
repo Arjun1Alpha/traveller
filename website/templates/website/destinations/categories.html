@@ -1,0 +1,81 @@
+{% extends "website/base.html" %}
+{% block title %}Categories — {{ destination.name }} — {{ site_settings.site_name }}{% endblock %}
+{% block content %}
+<nav class="mb-3" aria-label="Breadcrumb">
+  <ol class="breadcrumb small mb-0">
+    <li class="breadcrumb-item"><a href="{% url 'destination_list' %}" class="text-decoration-none">Destinations</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'destination_hub' destination.slug %}" class="text-decoration-none">{{ destination.name }}</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Categories</li>
+  </ol>
+</nav>
+
+<div class="cw-cat-hero cw-page-hero rounded-4 overflow-hidden mb-4 mb-lg-5">
+  <div class="p-4 p-lg-5">
+    <div class="row align-items-center g-4">
+      <div class="col-lg-8">
+        <p class="cw-home-section-head__kicker mb-2">Browse by theme</p>
+        <h1 class="cw-home-section-head__title display-6 mb-3">{{ destination.name }} categories</h1>
+        <p class="text-secondary mb-0 lead fs-6">Each category groups experiences and tours so you can plan faster — open one to see every tour inside.</p>
+      </div>
+      <div class="col-lg-4 text-lg-end">
+        <a href="{% url 'tour_list' destination.slug %}" class="btn btn-cw-accent rounded-pill px-4 shadow-sm">All tours in {{ destination.name }}</a>
+      </div>
+    </div>
+    <div class="cw-page-hero__footer">
+      {% include "website/includes/entity_tagging_strip.html" with destination=destination blog_posts=listing_blog_posts testimonials=listing_testimonials %}
+    </div>
+  </div>
+</div>
+
+{% if categories %}
+<div class="row g-4 mb-5">
+  {% for c in categories %}
+  <div class="col-md-6 col-xl-4">
+    <article class="cw-cat-card h-100 position-relative cw-card-hover">
+      <a href="{{ c.get_absolute_url }}" class="stretched-link text-decoration-none" aria-labelledby="cat-title-{{ c.id }}"></a>
+      <div class="cw-cat-card__accent" aria-hidden="true"></div>
+      <div class="cw-cat-card__inner">
+        <div class="cw-cat-card__head d-flex align-items-start justify-content-between gap-3">
+          <div class="cw-cat-card__icon" aria-hidden="true"><i class="bi bi-grid-1x2-fill"></i></div>
+          {% if c.tour_count %}
+          <span class="cw-cat-card__count-pill">{{ c.tour_count }} tour{{ c.tour_count|pluralize }}</span>
+          {% else %}
+          <span class="cw-cat-card__count-pill cw-cat-card__count-pill--muted">Soon</span>
+          {% endif %}
+        </div>
+        <h2 class="h5 fw-bold text-cw-navy mb-2" id="cat-title-{{ c.id }}">{{ c.name }}</h2>
+        {% if c.summary %}
+        <p class="small text-secondary mb-0 cw-line-clamp-4 flex-grow-1">{{ c.summary }}</p>
+        {% else %}
+        <p class="small text-secondary mb-0 cw-line-clamp-3 flex-grow-1">Curated tours and experiences for this theme in {{ destination.name }}.</p>
+        {% endif %}
+        <div class="cw-cat-card__cta d-flex align-items-center justify-content-between pt-3 mt-3">
+          <span class="small fw-semibold text-cw-accent">Explore</span>
+          <span class="cw-cat-card__cta-icon" aria-hidden="true"><i class="bi bi-arrow-up-right"></i></span>
+        </div>
+      </div>
+    </article>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="text-center py-5 px-4 cw-home-empty-soft rounded-4">
+  <div class="cw-dest-empty-icon rounded-circle d-inline-flex align-items-center justify-content-center mb-3">
+    <i class="bi bi-folder2-open text-cw-accent fs-3" aria-hidden="true"></i>
+  </div>
+  <p class="text-secondary mb-4">No categories for this destination yet.</p>
+  <a href="{% url 'destination_hub' destination.slug %}" class="btn btn-outline-primary rounded-pill">Back to {{ destination.name }}</a>
+</div>
+{% endif %}
+
+{% include "website/includes/entity_gallery_section.html" with gallery_images=listing_gallery_images section_title="Photo highlights" %}
+
+{% include "website/includes/entity_blog_section.html" with blog_posts=listing_blog_posts section_kicker="Guides & stories" section_title="Blog posts for these categories" %}
+
+{% include "website/includes/entity_testimonials_section.html" with testimonials=listing_testimonials rail_subtitle="Reviews tagged to any category here, or favorites from across our trips." %}
+
+<div class="mt-5 pt-4 border-top border-light d-flex flex-wrap gap-3 justify-content-between align-items-center">
+  <a href="{% url 'destination_hub' destination.slug %}" class="text-decoration-none text-secondary small"><i class="bi bi-arrow-left me-1" aria-hidden="true"></i>{{ destination.name }} hub</a>
+  <a href="{% url 'destination_list' %}" class="text-decoration-none text-cw-accent small fw-semibold">All destinations</a>
+</div>
+{% endblock %}

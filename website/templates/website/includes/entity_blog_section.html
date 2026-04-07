@@ -1,0 +1,36 @@
+{% if blog_posts %}
+<section id="cw-entity-blog" class="cw-entity-section cw-tour-pdp-blog mb-5">
+  <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+    <div>
+      <p class="cw-home-section-head__kicker mb-1">{{ section_kicker|default:"From the blog" }}</p>
+      <h2 class="h4 fw-bold text-cw-navy mb-0">{{ section_title|default:"Related articles" }}</h2>
+    </div>
+    <a href="{% url 'blog_index' %}" class="btn btn-sm btn-outline-primary rounded-pill">All articles</a>
+  </div>
+  <div class="row g-4">
+    {% for p in blog_posts %}
+    <div class="col-md-6 col-lg-4">
+      <article class="cw-tour-pdp-blog-card h-100 overflow-hidden d-flex flex-column rounded-4 border border-light shadow-sm cw-card-hover">
+        <a href="{{ p.get_absolute_url }}" class="text-decoration-none text-reset d-flex flex-column h-100">
+          <div class="ratio ratio-4x3 overflow-hidden flex-shrink-0 bg-cw-sky">
+            {% if p.listing_image_url %}
+            <img src="{{ p.listing_image_url }}" alt="" class="object-fit-cover" loading="lazy" width="400" height="300">
+            {% elif site_settings.default_card_image_url %}
+            <img src="{{ site_settings.default_card_image_url }}" alt="" class="object-fit-cover" loading="lazy" width="400" height="300">
+            {% else %}
+            <img src="{% cycle 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=600&q=80' 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&q=80' 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=600&q=80' %}" alt="" class="object-fit-cover" loading="lazy" width="400" height="300">
+            {% endif %}
+          </div>
+          <div class="p-3 flex-grow-1 d-flex flex-column">
+            <span class="badge rounded-pill cw-home-blog-scope align-self-start mb-2">{{ p.get_scope_display }}</span>
+            <h3 class="h6 fw-bold text-cw-navy mb-2">{{ p.title }}</h3>
+            {% if p.excerpt %}<p class="small text-secondary cw-line-clamp-2 mb-0">{{ p.excerpt }}</p>{% endif %}
+            <span class="small fw-semibold text-cw-accent mt-3">Read <i class="bi bi-arrow-up-right" aria-hidden="true"></i></span>
+          </div>
+        </a>
+      </article>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}

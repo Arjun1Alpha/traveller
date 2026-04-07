@@ -1,0 +1,263 @@
+{% extends "website/base.html" %}
+{% block title %}{{ site_page.title }} — {{ site_settings.site_name }}{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+{% endblock %}
+{% block layout %}
+<section
+  class="position-relative text-white d-flex align-items-end cw-about-hero"
+  style="background: center/cover no-repeat url('{{ about_hero_image }}');"
+>
+  <div class="position-absolute top-0 start-0 w-100 h-100 cw-hero-overlay"></div>
+  <div class="position-absolute top-0 start-0 w-100 h-100 cw-about-hero__mesh" aria-hidden="true"></div>
+  <div class="container position-relative pb-5 pt-5">
+    <nav class="mb-4" aria-label="Breadcrumb">
+      <ol class="breadcrumb small mb-0">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-white-50 text-decoration-none">Home</a></li>
+        <li class="breadcrumb-item active text-white" aria-current="page">{{ site_page.title }}</li>
+      </ol>
+    </nav>
+    <p class="text-uppercase small fw-semibold mb-2 text-white-50 cw-about-hero__kicker">Our story</p>
+    <h1 class="cw-hero-title text-uppercase mb-3 col-lg-10 px-0">{{ site_page.title }}</h1>
+    {% if site_page.intro %}
+    <p class="cw-hero-sub mb-4 col-lg-8 px-0">{{ site_page.intro|linebreaksbr }}</p>
+    {% endif %}
+    <div class="d-flex flex-wrap gap-2">
+      <a href="{% url 'destination_list' %}" class="btn btn-cw-accent btn-lg px-4">Explore destinations</a>
+      <a href="{% url 'contact' %}" class="btn btn-outline-light btn-lg px-4">Contact us</a>
+    </div>
+  </div>
+</section>
+
+<section class="py-5 border-bottom border-light bg-white">
+  <div class="container">
+    <div class="row g-4 g-lg-5 align-items-start">
+      <div class="col-lg-7">
+        <h2 class="h4 fw-bold text-cw-navy mb-4">Why we’re different</h2>
+        {% if site_page.body %}
+        <div class="cw-about-prose text-secondary">{{ site_page.body|linebreaks }}</div>
+        {% else %}
+        <p class="text-secondary mb-0 lead">We’re curators and former guides — the full story lives in our hubs, tours, and journal. Explore below or get in touch anytime.</p>
+        {% endif %}
+      </div>
+      <div class="col-lg-5">
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100">
+          <div class="card-body p-4 p-lg-5 bg-gradient-cw-about">
+            <h3 class="h6 text-uppercase text-white-50 mb-4" style="letter-spacing: 0.12em;">What guides us</h3>
+            <ul class="list-unstyled mb-0">
+              <li class="d-flex gap-3 mb-4">
+                <span class="cw-about-value-icon flex-shrink-0 rounded-3 d-flex align-items-center justify-content-center" aria-hidden="true"><i class="bi bi-people fs-4"></i></span>
+                <div>
+                  <span class="fw-bold text-white d-block">Guides first</span>
+                  <span class="small text-white-50">We started on the ground — curators who’ve led the walks, not just sold them.</span>
+                </div>
+              </li>
+              <li class="d-flex gap-3 mb-4">
+                <span class="cw-about-value-icon flex-shrink-0 rounded-3 d-flex align-items-center justify-content-center" aria-hidden="true"><i class="bi bi-shield-check fs-4"></i></span>
+                <div>
+                  <span class="fw-bold text-white d-block">Quality over volume</span>
+                  <span class="small text-white-50">Fewer listings, higher bar — every tour earns its place.</span>
+                </div>
+              </li>
+              <li class="d-flex gap-3 mb-0">
+                <span class="cw-about-value-icon flex-shrink-0 rounded-3 d-flex align-items-center justify-content-center" aria-hidden="true"><i class="bi bi-globe2 fs-4"></i></span>
+                <div>
+                  <span class="fw-bold text-white d-block">Built for explorers</span>
+                  <span class="small text-white-50">From first-time visitors to repeat travelers planning deeper trips.</span>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% if about_dest_slider %}
+<section class="py-5 cw-home-dest-section border-bottom border-light">
+  <div class="container">
+    <header class="text-center mb-5 mx-auto" style="max-width: 40rem;">
+      <p class="cw-home-section-head__kicker mb-0">Where we shine</p>
+      <h2 class="cw-home-section-head__title h3 mt-2 mb-2">Destinations we love</h2>
+      <p class="text-secondary small mb-0">Swipe through places featured on this page — each opens the full destination hub.</p>
+    </header>
+    <div class="swiper cw-home-swiper cw-home-swiper--nav-lg cw-about-dest-swiper">
+      <div class="swiper-wrapper">
+        {% for d, img in about_dest_slider %}
+        <div class="swiper-slide">
+          <a
+            href="{{ d.get_absolute_url }}"
+            class="cw-dest-card cw-home-dest-tile d-flex align-items-end text-white text-decoration-none position-relative h-100 {% if forloop.first %}cw-home-dest-tile--lead{% endif %}"
+            style="background-image: url('{{ img }}');"
+          >
+            {% if forloop.first %}
+            <span class="cw-home-dest-badge">Featured</span>
+            {% endif %}
+            <div class="cw-dest-label w-100 p-3 p-md-4 pt-5">
+              <span class="h5 fw-bold mb-0 d-block">{{ d.name }}</span>
+              {% if d.summary %}
+              <p class="small text-white-50 mb-0 mt-2 cw-line-clamp-2">{{ d.summary }}</p>
+              {% endif %}
+              <span class="d-inline-flex align-items-center gap-1 small fw-semibold text-white mt-3 opacity-90">
+                Open hub <i class="bi bi-arrow-right-short fs-5" aria-hidden="true"></i>
+              </span>
+            </div>
+          </a>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="swiper-button-prev" aria-label="Previous destinations"></div>
+      <div class="swiper-button-next" aria-label="Next destinations"></div>
+      <div class="swiper-pagination"></div>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% if about_gallery %}
+<section class="py-5 cw-about-gallery-section text-white border-bottom border-secondary border-opacity-25">
+  <div class="container mb-4">
+    <div class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-end gap-3">
+      <div>
+        <p class="small text-uppercase fw-semibold text-white-50 mb-1" style="letter-spacing: 0.14em;">Gallery</p>
+        <h2 class="h4 fw-bold mb-0">Moments from the road</h2>
+      </div>
+      <p class="text-white-50 small mb-0 col-md-5">A rotating strip of scenes from our catalog — managed in the admin gallery.</p>
+    </div>
+  </div>
+  <div class="container-fluid px-0 px-md-3">
+    <div class="swiper cw-home-swiper cw-about-gallery-swiper pb-4">
+      <div class="swiper-wrapper">
+        {% for g in about_gallery %}
+        <div class="swiper-slide">
+          <figure class="cw-about-gallery-slide mb-0 shadow">
+            <img src="{{ g.image_url }}" alt="{{ g.alt_text|default:'Travel moment' }}" class="d-block" loading="lazy" width="480" height="360">
+          </figure>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="swiper-pagination"></div>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% if about_testimonials %}
+<section class="py-5 bg-cw-sky border-bottom border-light">
+  <div class="container">
+    <header class="text-center mb-5 mx-auto" style="max-width: 36rem;">
+      <p class="cw-home-section-head__kicker mb-0">Travelers say</p>
+      <h2 class="cw-home-section-head__title h3 mt-2 mb-0">Reviews & stories</h2>
+    </header>
+    <div class="swiper cw-home-swiper cw-about-testimonial-swiper pb-5">
+      <div class="swiper-wrapper">
+        {% for t in about_testimonials %}
+        <div class="swiper-slide">
+          <div class="card border-0 shadow-sm mx-auto cw-about-quote-card h-100">
+            <div class="card-body p-4 p-md-5 text-center d-flex flex-column">
+              <div class="text-warning mb-3" aria-hidden="true">
+                {% for _ in "12345" %}
+                {% if forloop.counter <= t.rating %}<i class="bi bi-star-fill"></i>{% endif %}
+                {% endfor %}
+              </div>
+              <blockquote class="mb-4 flex-grow-1">
+                <p class="fst-italic lead text-cw-navy mb-0">“{{ t.quote }}”</p>
+              </blockquote>
+              {% if t.author %}<footer class="small text-muted mb-0">— {{ t.author }}</footer>{% endif %}
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="swiper-pagination"></div>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% include "website/includes/related_picks.html" %}
+
+<div class="container py-4 py-lg-5 cw-page">
+  {% if lead_form %}{% include "website/includes/lead_form.html" %}{% endif %}
+</div>
+{% endblock %}
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    function slidesCount(root) {
+      return root ? root.querySelectorAll('.swiper-slide').length : 0;
+    }
+    document.querySelectorAll('.cw-about-dest-swiper').forEach(function (el) {
+      var n = slidesCount(el);
+      new Swiper(el, {
+        slidesPerView: 1.08,
+        spaceBetween: 16,
+        grabCursor: true,
+        watchOverflow: true,
+        loop: n > 3,
+        speed: 600,
+        keyboard: { enabled: true },
+        pagination: {
+          el: el.querySelector('.swiper-pagination'),
+          clickable: true,
+        },
+        navigation: {
+          prevEl: el.querySelector('.swiper-button-prev'),
+          nextEl: el.querySelector('.swiper-button-next'),
+        },
+        breakpoints: {
+          576: { slidesPerView: 1.35, spaceBetween: 18 },
+          768: { slidesPerView: 2.1, spaceBetween: 20 },
+          992: { slidesPerView: 2.75, spaceBetween: 22 },
+          1200: { slidesPerView: 3.25, spaceBetween: 24 },
+        },
+      });
+    });
+    document.querySelectorAll('.cw-about-gallery-swiper').forEach(function (el) {
+      var n = slidesCount(el);
+      new Swiper(el, {
+        slidesPerView: 1.35,
+        spaceBetween: 12,
+        centeredSlides: true,
+        grabCursor: true,
+        watchOverflow: true,
+        loop: n > 4,
+        speed: 500,
+        autoplay: n > 2 ? { delay: 3200, disableOnInteraction: false, pauseOnMouseEnter: true } : false,
+        keyboard: { enabled: true },
+        pagination: {
+          el: el.querySelector('.swiper-pagination'),
+          clickable: true,
+        },
+        breakpoints: {
+          576: { slidesPerView: 2.1, spaceBetween: 14 },
+          768: { slidesPerView: 2.85, spaceBetween: 16 },
+          992: { slidesPerView: 3.6, spaceBetween: 18 },
+          1200: { slidesPerView: 4.2, spaceBetween: 20 },
+        },
+      });
+    });
+    document.querySelectorAll('.cw-about-testimonial-swiper').forEach(function (el) {
+      var n = slidesCount(el);
+      var pag = el.querySelector('.swiper-pagination');
+      new Swiper(el, {
+        slidesPerView: 1,
+        spaceBetween: 20,
+        grabCursor: true,
+        watchOverflow: true,
+        loop: n > 2,
+        speed: 550,
+        autoplay: n > 1 ? { delay: 5500, disableOnInteraction: false, pauseOnMouseEnter: true } : false,
+        keyboard: { enabled: true },
+        pagination: pag ? { el: pag, clickable: true } : undefined,
+        breakpoints: {
+          768: { slidesPerView: 1.15, spaceBetween: 24 },
+          992: { slidesPerView: 1.35, spaceBetween: 28 },
+        },
+      });
+    });
+  });
+</script>
+{% endblock %}
