@@ -64,7 +64,10 @@ class Migration(migrations.Migration):
         ),
         migrations.AddConstraint(
             model_name='cart',
-            constraint=models.CheckConstraint(condition=models.Q(('user__isnull', False), ('session_key__isnull', False), _connector='OR'), name='website_cart_user_or_session'),
+            constraint=models.CheckConstraint(
+                check=models.Q(user__isnull=False) | models.Q(session_key__isnull=False),
+                name='website_cart_user_or_session'
+            ),
         ),
         migrations.AddConstraint(
             model_name='cart',
