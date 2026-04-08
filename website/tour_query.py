@@ -1,11 +1,12 @@
 """Filter and sort tour querysets from GET parameters (list + category pages)."""
 
 from decimal import Decimal, InvalidOperation
+from typing import Optional
 
 from django.db.models import F, Q, QuerySet
 
 
-def _decimal(val: str | None) -> Decimal | None:
+def _decimal(val: Optional[str]) -> Optional[Decimal]:
     if val is None or not str(val).strip():
         return None
     try:
