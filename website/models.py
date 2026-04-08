@@ -798,7 +798,7 @@ class Cart(models.Model):
     class Meta:
         constraints = [
             models.CheckConstraint(
-                condition=models.Q(user__isnull=False)
+                check=models.Q(user__isnull=False)
                 | models.Q(session_key__isnull=False),
                 name="website_cart_user_or_session",
             ),
