@@ -3,7 +3,7 @@ from types import SimpleNamespace
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.db.models import Count, Q
+from django.db.models import Count, Min, Q
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
@@ -250,10 +250,20 @@ def home(request):
 
     nfb = len(_FALLBACK_CARD_IMAGES)
     default_card = site_settings.default_card_image_url
+    tour_stats_qs = (
+        Tour.objects.filter(destination__in=dests)
+        .values("destination_id")
+        .annotate(
+            min_price=Min("price_from"),
+            min_duration=Min("duration_hours"),
+        )
+    )
+    tour_stats = {row["destination_id"]: row for row in tour_stats_qs}
     ctx["destination_showcase"] = [
         (
             d,
             (d.listing_image_url or default_card or _FALLBACK_CARD_IMAGES[i % nfb]),
+            tour_stats.get(d.id, {}),
         )
         for i, d in enumerate(dests)
     ]
@@ -288,13 +298,33 @@ def home(request):
     ctx["expert_bullets"] = list(
         home_cfg.expert_bullets.order_by("sort_order")
     )
+    ctx["query_destinations"] = list(Destination.objects.order_by("name")[:50])
+    ctx["query_categories"] = list(
+        DestinationCategory.objects.select_related("destination")
+        .order_by("destination__name", "name")[:80]
+    )
+    ctx["query_tours"] = list(
+        Tour.objects.select_related("destination")
+        .order_by("destination__name", "name")[:80]
+    )
     return render(request, "website/home.html", ctx)
 
 
 def search(request):
     q = request.GET.get("q", "").strip()
-    ctx = {"search_q": q, "search_limit": _SEARCH_RESULTS_LIMIT}
-    if not q:
+    people_raw = request.GET.get("people", "").strip()
+    people_count = None
+    for token in people_raw.replace("+", " ").split():
+        if token.isdigit():
+            people_count = int(token)
+            break
+
+    ctx = {
+        "search_q": q,
+        "search_limit": _SEARCH_RESULTS_LIMIT,
+        "search_people": people_raw,
+    }
+    if not q and people_count is None:
         return render(request, "website/search.html", ctx)
 
     dest_q = (
@@ -318,27 +348,39 @@ def search(request):
     att_q = Q(name__icontains=q) | Q(slug__icontains=q) | Q(summary__icontains=q)
     todo_q = Q(name__icontains=q) | Q(slug__icontains=q) | Q(summary__icontains=q)
 
-    ctx["result_destinations"] = list(
-        Destination.objects.filter(dest_q).order_by("name")[:_SEARCH_RESULTS_LIMIT]
-    )
-    ctx["result_blog_posts"] = list(
-        BlogPost.objects.filter(blog_q)
-        .order_by("-published_at", "title")[:_SEARCH_RESULTS_LIMIT]
-    )
+    if q:
+        ctx["result_destinations"] = list(
+            Destination.objects.filter(dest_q).order_by("name")[:_SEARCH_RESULTS_LIMIT]
+        )
+        ctx["result_blog_posts"] = list(
+            BlogPost.objects.filter(blog_q)
+            .order_by("-published_at", "title")[:_SEARCH_RESULTS_LIMIT]
+        )
+        ctx["result_attractions"] = list(
+            Attraction.objects.filter(att_q)
+            .select_related("destination")
+            .order_by("destination__name", "name")[:_SEARCH_RESULTS_LIMIT]
+        )
+        ctx["result_things"] = list(
+            ThingToDo.objects.filter(todo_q)
+            .select_related("destination")
+            .order_by("destination__name", "name")[:_SEARCH_RESULTS_LIMIT]
+        )
+    else:
+        ctx["result_destinations"] = []
+        ctx["result_blog_posts"] = []
+        ctx["result_attractions"] = []
+        ctx["result_things"] = []
+
+    tours_qs = Tour.objects.select_related("destination", "category")
+    if q:
+        tours_qs = tours_qs.filter(tour_q)
+    if people_count is not None:
+        tours_qs = tours_qs.filter(
+            Q(group_size_max__gte=people_count) | Q(group_size_max__isnull=True)
+        )
     ctx["result_tours"] = list(
-        Tour.objects.filter(tour_q)
-        .select_related("destination", "category")
-        .order_by("destination__name", "name")[:_SEARCH_RESULTS_LIMIT]
-    )
-    ctx["result_attractions"] = list(
-        Attraction.objects.filter(att_q)
-        .select_related("destination")
-        .order_by("destination__name", "name")[:_SEARCH_RESULTS_LIMIT]
-    )
-    ctx["result_things"] = list(
-        ThingToDo.objects.filter(todo_q)
-        .select_related("destination")
-        .order_by("destination__name", "name")[:_SEARCH_RESULTS_LIMIT]
+        tours_qs.order_by("destination__name", "name")[:_SEARCH_RESULTS_LIMIT]
     )
     ctx["total_matches"] = (
         len(ctx["result_destinations"])

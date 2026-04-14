@@ -1,105 +1,178 @@
 {% extends "website/base.html" %}
-{% load site_tags %}
+{% load site_tags static %}
 {% block title %}{{ site_page.title }} — {{ site_settings.site_name }}{% endblock %}
+{% block body_class %}cw-home-page{% endblock %}
 {% block extra_head %}
 {% if destination_showcase or home_blog_posts or gallery_images or testimonials %}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
 {% endif %}
 {% endblock %}
 {% block layout %}
-<section
-  class="position-relative text-white d-flex align-items-end"
-  style="min-height: 72vh; background: center/cover no-repeat url('{{ hero_image_url }}');"
->
-  <div class="position-absolute top-0 start-0 w-100 h-100 cw-hero-overlay"></div>
-  <div class="container position-relative pb-5 pt-5">
-    {% if home_cfg.hero_kicker %}
-    <p class="text-uppercase small fw-semibold mb-2 text-white-50" style="letter-spacing: 0.14em;">{{ home_cfg.hero_kicker }}</p>
-    {% endif %}
-    <h1 class="cw-hero-title text-uppercase mb-3">{{ site_page.title }}</h1>
-    <p class="cw-hero-sub mb-4">
-      {% if site_page.intro %}{{ site_page.intro }}{% elif home_cfg.hero_intro_fallback %}{{ home_cfg.hero_intro_fallback }}{% endif %}
-    </p>
-    <div class="d-flex flex-wrap gap-2">
-      <a href="{% cw_href home_cfg.hero_cta_primary_link %}" class="btn btn-cw-accent btn-lg px-4">{{ home_cfg.hero_cta_primary_label }}</a>
-      {% if home_cfg.hero_cta_secondary_label %}
-      <a href="{% cw_href home_cfg.hero_cta_secondary_link %}" class="btn btn-outline-light btn-lg px-4">{{ home_cfg.hero_cta_secondary_label }}</a>
-      {% endif %}
-    </div>
-    {% if hero_icon_features %}
-    <div class="d-flex flex-wrap gap-4 mt-5 cw-value-bar pt-4">
-      {% for f in hero_icon_features %}
-      <div class="d-flex align-items-center gap-2 small">
-        <i class="{{ f.icon }} text-white fs-5" aria-hidden="true"></i>
-        <span>{% if f.title %}{{ f.title }}{% else %}{{ f.body }}{% endif %}</span>
+<section class="cw-home-hero-wrap">
+  <div class="cw-home-hero-shell">
+    <picture class="cw-home-hero-logo-wrap">
+      <source srcset="{% static 'assets/images/logo.png' %}" media="(min-width: 768px)">
+      <source srcset="{% static 'assets/images/logo2.png' %}" media="(max-width: 768px)">
+      <img src="{% static 'assets/images/logo.png' %}" class="cw-home-hero-logo" alt="Northhike logo" width="100%" height="100%">
+    </picture>
+
+    <section class="cw-home-hero text-white d-flex align-items-end">
+      <video class="cw-home-hero-video" src="{% static 'assets/videos/bg2.mp4' %}" autoplay muted loop playsinline></video>
+      <div class="cw-home-hero-overlay"></div>
+      <div class="cw-home-hero-content">
+        <div class="cw-home-hero-copy">
+          {% if home_cfg.hero_kicker %}
+          <p class="cw-home-hero-copy__kicker mb-2">{{ home_cfg.hero_kicker }}</p>
+          {% endif %}
+          <h1 class="cw-hero-title mb-2" style="color: rgb(0, 0, 0.9);">{{ site_page.title }}</h1>
+          <p class="cw-hero-sub mb-0" style="color: rgb(0, 0, 0.9);">
+            {% if site_page.intro %}{{ site_page.intro }}{% elif home_cfg.hero_intro_fallback %}{{ home_cfg.hero_intro_fallback }}{% endif %}
+          </p>
+        </div>
+        <form class="cw-home-query-card" method="get" action="{% url 'search' %}" aria-label="Travel query form" data-cw-hero-query-form>
+          <div class="cw-home-query-grid">
+            <div class="cw-home-query-field">
+              <span class="cw-home-query-label">Destination</span>
+              <select class="cw-home-query-select" name="destination" aria-label="Destination" data-cw-query-destination>
+                <option value="">Any destination</option>
+                {% for d in query_destinations %}
+                <option value="{{ d.name }}" data-destination="{{ d.name|lower }}">{{ d.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="cw-home-query-field">
+              <span class="cw-home-query-label">Category</span>
+              <select class="cw-home-query-select" name="category" aria-label="Category" data-cw-query-category>
+                <option value="">Any category</option>
+                {% for c in query_categories %}
+                <option value="{{ c.name }}" data-destination="{{ c.destination.name|lower }}" data-category="{{ c.name|lower }}">{{ c.destination.name }} - {{ c.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="cw-home-query-field">
+              <span class="cw-home-query-label">Tour</span>
+              <select class="cw-home-query-select" name="tour" aria-label="Tour" data-cw-query-tour>
+                <option value="">Any tour</option>
+                {% for t in query_tours %}
+                <option value="{{ t.name }}" data-destination="{{ t.destination.name|lower }}" data-category="{% if t.category %}{{ t.category.name|lower }}{% endif %}">{{ t.destination.name }} - {{ t.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="cw-home-query-field">
+              <span class="cw-home-query-label">People</span>
+              <select class="cw-home-query-select" name="people" aria-label="Number of people">
+                <option value="">Any group size</option>
+                <option value="1 traveller">1 traveller</option>
+                <option value="2 travellers">2 travellers</option>
+                <option value="3 travellers">3 travellers</option>
+                <option value="4 travellers">4 travellers</option>
+                <option value="5+ travellers">5+ travellers</option>
+              </select>
+            </div>
+            <button type="submit" class="cw-home-query-search" aria-label="Search">
+              <i class="bi bi-search"></i>
+            </button>
+          </div>
+          <input type="hidden" name="q" value="" data-cw-query-q>
+        </form>
       </div>
-      {% endfor %}
-    </div>
-    {% endif %}
+    </section>
+    <button
+      type="button"
+      class="btn rounded-pill px-4 d-inline-flex align-items-center text-nowrap cw-home-hero-menu h6 mb-0"
+      data-cw-menu-toggle
+      aria-label="Open site menu"
+      aria-expanded="false"
+      aria-controls="cw-home-menu-panel"
+    >
+      <span>Menu</span>
+      <span class="ms-2 fs-5"><i class="bi bi-list"></i></span>
+    </button>
+
+    <aside id="cw-home-menu-panel" class="cw-home-menu-panel" aria-hidden="true">
+      <div class="cw-home-menu-panel__overlay" data-cw-menu-close></div>
+      <div class="cw-home-menu-panel__dialog">
+        <button type="button" class="cw-home-menu-panel__close" data-cw-menu-close aria-label="Close menu">
+          <i class="bi bi-x-lg"></i>
+        </button>
+        <p class="cw-home-menu-panel__kicker mb-2">Explore</p>
+        <h2 class="h3 fw-bold text-cw-navy mb-4">Traveler Menu</h2>
+        <nav class="cw-home-menu-panel__nav" aria-label="Main menu">
+          <a href="{% url 'home' %}">Home</a>
+          <a href="{% url 'destination_list' %}">Destinations</a>
+          <a href="{% url 'blog_index' %}">Blog</a>
+          <a href="{% url 'about' %}">About</a>
+          <a href="{% url 'contact' %}">Contact</a>
+          <a href="{% url 'faqs' %}">FAQs</a>
+        </nav>
+      </div>
+    </aside>
   </div>
 </section>
 
-{% if sky_icon_features %}
-<section class="bg-cw-sky border-bottom py-4">
-  <div class="container">
-    <div class="row g-4 text-center text-md-start">
-      {% for f in sky_icon_features %}
-      <div class="col-md-4 d-flex gap-3 justify-content-center justify-content-md-start">
-        <i class="{{ f.icon }} fs-2 text-cw-navy" aria-hidden="true"></i>
-        <div>
-          {% if f.title %}<h2 class="h6 fw-bold text-cw-navy mb-1">{{ f.title }}</h2>{% endif %}
-          {% if f.body %}<p class="small text-muted mb-0">{{ f.body }}</p>{% endif %}
-        </div>
-      </div>
-      {% endfor %}
-    </div>
-  </div>
-</section>
-{% endif %}
+
 
 {% if site_page.body %}
 <section class="py-5">
   <div class="container">
     <div class="row justify-content-center">
       <div class="col-lg-9 text-center">
+          
         <div class="lead text-secondary">{{ site_page.body|linebreaksbr }}</div>
       </div>
     </div>
   </div>
 </section>
 {% endif %}
-
+{% if sky_icon_features %}
+<section class="cw-home-sky-section py-5">
+  <div class="container">
+    <div class="row g-3 g-lg-4">
+      {% for f in sky_icon_features %}
+      <div class="col-md-4">
+        <article class="cw-home-sky-card h-100">
+          <div class="cw-home-sky-card__icon" aria-hidden="true">
+            <i class="{{ f.icon }} fs-4"></i>
+          </div>
+          <div>
+            {% if f.title %}<h2 class="h6 fw-bold text-cw-navy mb-2">{{ f.title }}</h2>{% endif %}
+            {% if f.body %}<p class="small text-muted mb-0">{{ f.body }}</p>{% endif %}
+          </div>
+        </article>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
 <section class="py-5 cw-home-dest-section">
   <div class="container">
-    <header class="text-center mb-5 mx-auto" style="max-width: 40rem;">
+    <header class="cw-home-dest-head text-center text-lg-start mb-4 mb-lg-5">
       {% if home_cfg.destinations_kicker %}
-      <p class="cw-home-section-head__kicker mb-0">{{ home_cfg.destinations_kicker }}</p>
+      <p class="cw-home-section-head__kicker mb-1">{{ home_cfg.destinations_kicker }}</p>
       {% endif %}
       {% if home_cfg.destinations_title %}
-      <h2 class="cw-home-section-head__title display-6 mt-2 mb-0">{{ home_cfg.destinations_title }}</h2>
+      <h2 class="cw-home-section-head__title h2 mb-0">{{ home_cfg.destinations_title }}</h2>
       {% endif %}
     </header>
     {% if destination_showcase %}
     <div class="swiper cw-home-swiper cw-home-swiper--nav-lg cw-home-dest-swiper">
       <div class="swiper-wrapper">
-        {% for d, img in destination_showcase %}
+        {% for d, img, stats in destination_showcase %}
         <div class="swiper-slide">
           <a
             href="{{ d.get_absolute_url }}"
-            class="cw-dest-card cw-home-dest-tile d-flex align-items-end text-white text-decoration-none position-relative h-100 {% if forloop.first %}cw-home-dest-tile--lead{% endif %}"
-            style="background-image: url('{{ img }}');"
+            class="cw-home-dest-tile text-decoration-none h-100 d-flex flex-column {% if forloop.first %}cw-home-dest-tile--lead{% endif %}"
           >
-            {% if forloop.first %}
-            <span class="cw-home-dest-badge">Spotlight</span>
-            {% endif %}
-            <div class="cw-dest-label w-100 p-3 p-md-4 pt-5">
-              <span class="h5 fw-bold mb-0 d-block">{{ d.name }}</span>
+            <div class="cw-home-dest-tile__media" style="background-image: url('{{ img }}');"></div>
+            <div class="cw-home-dest-tile__body p-3 p-md-4">
+              <span class="h4 fw-bold text-cw-navy mb-1 d-block">{{ d.name }}</span>
+              <p class="small text-secondary mb-0">
+                {% if stats.min_duration %}{{ stats.min_duration|floatformat:0 }}h{% else %}Flexible{% endif %}, guided
+              </p>
               {% if d.summary %}
-              <p class="small text-white-50 mb-0 mt-2 cw-line-clamp-2">{{ d.summary }}</p>
+              <p class="small text-muted mb-0 mt-1 cw-line-clamp-2">{{ d.summary }}</p>
               {% endif %}
-              <span class="d-inline-flex align-items-center gap-1 small fw-semibold text-white mt-3 opacity-90">
-                Explore hub <i class="bi bi-arrow-right-short fs-5" aria-hidden="true"></i>
-              </span>
             </div>
           </a>
         </div>
@@ -107,7 +180,6 @@
       </div>
       <div class="swiper-button-prev" aria-label="Previous destinations"></div>
       <div class="swiper-button-next" aria-label="Next destinations"></div>
-      <div class="swiper-pagination"></div>
     </div>
     {% else %}
     <div class="text-center py-5 px-4 cw-home-empty-soft">
@@ -118,8 +190,8 @@
       <a href="{% url 'destination_list' %}" class="btn btn-cw-accent rounded-pill px-4">{{ home_cfg.destinations_empty_cta_label }}</a>
     </div>
     {% endif %}
-    <div class="text-center mt-5">
-      <a href="{% url 'destination_list' %}" class="btn btn-outline-primary rounded-pill px-4">{{ home_cfg.destinations_view_all_label }}</a>
+    <div class="text-center mt-4 mt-lg-5">
+      <a href="{% url 'destination_list' %}" class="btn btn-cw-accent rounded-pill px-4">{{ home_cfg.destinations_view_all_label }}</a>
     </div>
   </div>
 </section>
@@ -137,7 +209,7 @@
     <div class="row justify-content-center">
       <div class="col-lg-10">
         <a href="{% cw_href home_cfg.video_watch_url %}" class="cw-video-poster ratio ratio-16x9 rounded-3 shadow d-flex align-items-center justify-content-center text-white text-decoration-none position-relative overflow-hidden" style="background-image: linear-gradient(rgba(15,40,65,0.5), rgba(15,40,65,0.6)), url('{{ home_cfg.video_poster_url }}');">
-          <span class="display-1"><i class="bi bi-play-circle-fill" aria-hidden="true"></i></span>
+          <iframe width="560" height="315" src="https://www.youtube.com/embed/Dbgkjjg-qLM?si=8Rw37aDFZJEX-f-T&amp;controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
         </a>
       </div>
     </div>
@@ -328,6 +400,214 @@
 </div>
 {% endblock %}
 {% block extra_js %}
+<script>
+  function setHomeHeroClipPath() {
+    var hero = document.querySelector('.cw-home-hero');
+    if (!hero) return;
+    var w = hero.offsetWidth;
+    var h = hero.offsetHeight;
+    var mobile = window.innerWidth < 768;
+    var notchW = mobile ? 68 : 280;
+    var notchH = mobile ? 68 : 100;
+    var curve = 30;
+    hero.style.clipPath = `path("M 0 ${h} H ${w} V ${curve} Q ${w} 0 ${w - curve} 0 H ${notchW + curve} Q ${notchW} 0 ${notchW} ${curve} L ${notchW} ${notchH - curve} Q ${notchW} ${notchH} ${notchW - curve} ${notchH} L ${curve} ${notchH} Q 0 ${notchH} 0 ${notchH + curve} Z")`;
+  }
+
+  function initHomeMenuPanel() {
+    var panel = document.getElementById('cw-home-menu-panel');
+    var toggle = document.querySelector('[data-cw-menu-toggle]');
+    if (!panel || !toggle) return;
+
+    function openPanel() {
+      panel.classList.add('is-open');
+      panel.setAttribute('aria-hidden', 'false');
+      toggle.classList.add('is-open');
+      toggle.setAttribute('aria-expanded', 'true');
+      document.body.classList.add('cw-home-menu-open');
+    }
+
+    function closePanel() {
+      panel.classList.remove('is-open');
+      panel.setAttribute('aria-hidden', 'true');
+      toggle.classList.remove('is-open');
+      toggle.setAttribute('aria-expanded', 'false');
+      document.body.classList.remove('cw-home-menu-open');
+    }
+
+    toggle.addEventListener('click', function () {
+      if (panel.classList.contains('is-open')) closePanel();
+      else openPanel();
+    });
+
+    panel.querySelectorAll('[data-cw-menu-close]').forEach(function (el) {
+      el.addEventListener('click', closePanel);
+    });
+
+    document.addEventListener('keydown', function (ev) {
+      if (ev.key === 'Escape' && panel.classList.contains('is-open')) closePanel();
+    });
+  }
+
+  function initHomeHeaderScrollReveal() {
+    if (!document.body.classList.contains('cw-home-page')) return;
+    var threshold = window.innerHeight * 1.2;
+
+    function updateHeaderState() {
+      if (window.scrollY >= threshold) {
+        document.body.classList.add('cw-home-header-visible');
+      } else {
+        document.body.classList.remove('cw-home-header-visible');
+      }
+    }
+
+    updateHeaderState();
+    window.addEventListener('scroll', updateHeaderState, { passive: true });
+    window.addEventListener('resize', function () {
+      threshold = window.innerHeight * 1.2;
+      updateHeaderState();
+    });
+  }
+
+  function initHeroModelQueryForm() {
+    var forms = Array.prototype.slice.call(document.querySelectorAll('[data-cw-hero-query-form]'));
+    if (!forms.length) return;
+
+    forms.forEach(function (form) {
+      var qInput = form.querySelector('[data-cw-query-q]');
+      if (!qInput) return;
+      var destinationEl = form.querySelector('[data-cw-query-destination]');
+      var categoryEl = form.querySelector('[data-cw-query-category]');
+      var tourEl = form.querySelector('[data-cw-query-tour]');
+      var allSelects = Array.prototype.slice.call(form.querySelectorAll('.cw-home-query-select'));
+
+      function closeAllCustomSelects() {
+        allSelects.forEach(function (selectEl) {
+          var field = selectEl.closest('.cw-home-query-field');
+          if (field) field.classList.remove('is-open');
+        });
+      }
+
+      function enhanceSelect(selectEl) {
+        var field = selectEl.closest('.cw-home-query-field');
+        if (!field) return;
+        selectEl.classList.add('cw-home-query-select--native');
+        var trigger = document.createElement('button');
+        trigger.type = 'button';
+        trigger.className = 'cw-home-query-trigger';
+        trigger.setAttribute('aria-label', selectEl.getAttribute('aria-label') || 'Select value');
+        var dropdown = document.createElement('div');
+        dropdown.className = 'cw-home-query-dropdown';
+
+        function syncTrigger() {
+          var current = selectEl.options[selectEl.selectedIndex] || selectEl.options[0];
+          trigger.textContent = current ? current.text : '';
+        }
+
+        function renderDropdown() {
+          dropdown.innerHTML = '';
+          Array.prototype.forEach.call(selectEl.options, function (opt, idx) {
+            if (idx !== 0 && opt.hidden) return;
+            var btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'cw-home-query-option' + (opt.selected ? ' is-selected' : '');
+            btn.textContent = opt.text;
+            btn.dataset.value = opt.value;
+            dropdown.appendChild(btn);
+          });
+        }
+
+        trigger.addEventListener('click', function (ev) {
+          ev.stopPropagation();
+          var isOpen = field.classList.contains('is-open');
+          closeAllCustomSelects();
+          if (!isOpen) {
+            renderDropdown();
+            field.classList.add('is-open');
+          }
+        });
+
+        dropdown.addEventListener('click', function (ev) {
+          var target = ev.target.closest('.cw-home-query-option');
+          if (!target) return;
+          selectEl.value = target.dataset.value;
+          selectEl.dispatchEvent(new Event('change', { bubbles: true }));
+          syncTrigger();
+          renderDropdown();
+          field.classList.remove('is-open');
+        });
+
+        selectEl._cwRefreshUi = function () {
+          syncTrigger();
+          renderDropdown();
+        };
+
+        field.appendChild(trigger);
+        field.appendChild(dropdown);
+        selectEl.addEventListener('change', syncTrigger);
+        syncTrigger();
+        renderDropdown();
+      }
+
+      function applyOptionFilter(selectEl, predicate) {
+        if (!selectEl) return;
+        var hasSelectedHidden = false;
+        Array.prototype.forEach.call(selectEl.options, function (opt, idx) {
+          if (idx === 0) {
+            opt.hidden = false;
+            return;
+          }
+          var show = predicate(opt);
+          opt.hidden = !show;
+          if (!show && opt.selected) hasSelectedHidden = true;
+        });
+        if (hasSelectedHidden) selectEl.value = '';
+        if (selectEl._cwRefreshUi) selectEl._cwRefreshUi();
+      }
+
+      function syncDependentFilters() {
+        var destination = destinationEl && destinationEl.value ? destinationEl.value.toLowerCase() : '';
+        var category = categoryEl && categoryEl.value ? categoryEl.value.toLowerCase() : '';
+
+        applyOptionFilter(categoryEl, function (opt) {
+          if (!destination) return true;
+          return opt.dataset.destination === destination;
+        });
+
+        applyOptionFilter(tourEl, function (opt) {
+          if (destination && opt.dataset.destination !== destination) return false;
+          if (category && opt.dataset.category !== category) return false;
+          return true;
+        });
+      }
+
+      if (destinationEl) destinationEl.addEventListener('change', syncDependentFilters);
+      if (categoryEl) categoryEl.addEventListener('change', syncDependentFilters);
+
+      allSelects.forEach(enhanceSelect);
+      document.addEventListener('click', function () {
+        closeAllCustomSelects();
+      });
+      syncDependentFilters();
+
+      form.addEventListener('submit', function () {
+        var parts = [];
+        ['destination', 'category', 'tour'].forEach(function (name) {
+          var el = form.querySelector('[name="' + name + '"]');
+          if (el && el.value) parts.push(el.value);
+        });
+        qInput.value = parts.join(' ');
+      });
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    setHomeHeroClipPath();
+    initHomeMenuPanel();
+    initHomeHeaderScrollReveal();
+    initHeroModelQueryForm();
+  });
+  window.addEventListener('resize', setHomeHeroClipPath);
+</script>
 {% if destination_showcase or home_blog_posts or gallery_images or testimonials %}
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script>
@@ -345,10 +625,6 @@
         loop: n > 4,
         speed: 600,
         keyboard: { enabled: true },
-        pagination: {
-          el: el.querySelector('.swiper-pagination'),
-          clickable: true,
-        },
         navigation: {
           prevEl: el.querySelector('.swiper-button-prev'),
           nextEl: el.querySelector('.swiper-button-next'),

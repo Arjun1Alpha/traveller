@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-ys6^xp21q=4b753^o+j)!9cze17=ao0yv5j!pk1=8kohkk8@gi'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -127,6 +127,9 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
 # Sidebar groups for django-jazzmin: hide the flat "Website" app and show models under readable sections.
 _JAZZMIN_WEBSITE_MODEL_KEYS = [
     "website.sitesettings",
